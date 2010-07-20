@@ -45,8 +45,8 @@ namespace qmapcontrol
     /*!
      * This is the main widget.
      * To this control layers can be added.
-     * A MapControl have to be instantiated with a QSize which sets the size the widget takes in a layout.
-     * The given size is also the size, which is asured to be filled with map images.
+     * A MapControl has to be instantiated with a QSize which sets the size the widget takes in a layout.
+     * The given size is also the size which is assured to be filled with map images.
      *
      * @author Kai Winter <kaiwinter@gmx.de>
      */
@@ -55,26 +55,28 @@ namespace qmapcontrol
         Q_OBJECT
 
     public:
-        //! Declares what actions the mouse move has on the map
+        //! Declares what actions mouse movements have on the map
         enum MouseMode
         {
             Panning, /*!< The map is moved */
-            Dragging, /*!< A rectangular can be drawn */
-            None, /*!< Mouse move events have no efect to the map */
+            Dragging, /*!< A rectangle can be drawn */
+            None, /*!< Mouse movement events have no effect on the map */
         };
 
         //! The constructor of MapControl
         /*!
          * The MapControl is the widget which displays the maps.
-         * The size describes the area, which gets filled with map data
-         * When you give no MouseMode, the mouse is moving the map.
-         * You can change the MouseMode on runtime, to e.g. Dragging, which lets the user drag a rectangular box.
+         * The size describes the area which gets filled with map data
+         * When you give no MouseMode, the mouse moves the map.
+         * You can change the MouseMode at runtime, e.g. to Dragging, which lets the user drag a rectangular box.
          * After the dragging a signal with the size of the box is emitted.
-         * The mousemode ´None´ can be used, to completely define the control of the map yourself.
+         * The MouseMode ´None´ can be used, to completely define the control of the map yourself.
          * @param size the size which the widget should fill with map data
-         * @param mousemode the way mouseevents are handled
+         * @param mousemode the way mouse events are handled
+         * @param showScale true if the scale should be displayed
+         * @param showCrossHairs true if crosshairs should be shown at the centre of the map
          */
-        MapControl ( QSize size, MouseMode mousemode = Panning );
+        MapControl ( QSize size, MouseMode mousemode = Panning, bool showScale = false, bool showCrosshairs = true );
 
         ~MapControl();
 
@@ -212,7 +214,9 @@ namespace qmapcontrol
          *
          * @param show true if the scale should be displayed
          */
-        void showScale ( bool show );
+        void showScale ( bool visible );
+
+        void showCrosshairs ( bool visible );
 
     private:
         LayerManager* layermanager;
@@ -226,6 +230,7 @@ namespace qmapcontrol
         bool mousepressed;
         MouseMode mymousemode;
         bool scaleVisible;
+        bool crosshairsVisible;
 
         bool m_loadingFlag;
 

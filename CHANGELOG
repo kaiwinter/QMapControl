@@ -1,3 +1,10 @@
+2010-07-19
+- Added new ArrowPoint which renders as an arrowhead at a specified (and updateable) heading, providing orientation information for a Point on the map.
+- Made the map-center crosshairs optional via MapControl::showCrosshairs().
+- Cleaned up CirclePoint code, and added antialiasing hints to the rendering of it and ArrowPoint.
+- Added tile prefetching by default on Maemo 5 and Symbian targets. This may improve performance on those platforms, but no formal testing has yet been done.
+- Slayed some compiler warnings and typos, as well as some miscellaneous bugs
+
 0.9.5.2 (2009-07-29)
 =====
 - The new EmptyMapAdapter allows it to just display and navigate through an defined image and not to load map tiles. See new sample application.

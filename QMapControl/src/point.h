@@ -80,7 +80,7 @@ namespace qmapcontrol
          * @param x longitude
          * @param y latitude
          * @param name name of the point
-         * @param alignment allignment of the point (Middle or TopLeft)
+         * @param alignment alignment of the point (Middle or TopLeft)
          */
         Point(qreal x, qreal y, QString name = QString(), enum Alignment alignment=Middle);
 

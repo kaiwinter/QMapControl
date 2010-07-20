@@ -34,7 +34,7 @@ namespace qmapcontrol
 
         if (QPixmapCache::cacheLimit() <= 20000)
         {
-            QPixmapCache::setCacheLimit(20000);	// in kb
+            QPixmapCache::setCacheLimit(20000);	// in kB
         }
     }
 
@@ -77,8 +77,9 @@ namespace qmapcontrol
 
     QPixmap ImageManager::prefetchImage(const QString& host, const QString& url)
     {
-#ifdef Q_WS_QWS
-        // on mobile devices we don´t want the display resfreshing when tiles are received which are
+        // TODO See if this actually helps on the N900 & Symbian Phones
+#if defined Q_WS_QWS || defined Q_WS_MAEMO_5 || defined Q_WS_S60
+        // on mobile devices we don´t want the display refreshing when tiles are received which are
         // prefetched... This is a performance issue, because mobile devices are very slow in
         // repainting the screen
         prefetch.append(url);
@@ -105,7 +106,7 @@ namespace qmapcontrol
         else
         {
 
-#ifdef Q_WS_QWS
+#if defined Q_WS_QWS || defined Q_WS_MAEMO_5 || defined Q_WS_S60
             prefetch.remove(prefetch.indexOf(url));
 #endif
         }

@@ -5,6 +5,7 @@
 #include "src/point.h"
 #include "src/imagepoint.h"
 #include "src/circlepoint.h"
+#include "src/arrowpoint.h"
 #include "src/linestring.h"
 #include "src/gps_position.h"
 #include "src/osmmapadapter.h"
