@@ -72,6 +72,8 @@ namespace qmapcontrol
          */
         virtual void setPen(QPen* pen);
 
+    private:
+        void drawCircle();
     };
 }
 #endif

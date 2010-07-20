@@ -26,8 +26,8 @@
 #include "mapcontrol.h"
 namespace qmapcontrol
 {
-    MapControl::MapControl(QSize size, MouseMode mousemode)
-        : size(size), mymousemode(mousemode), scaleVisible(false)
+    MapControl::MapControl(QSize size, MouseMode mousemode, bool showScale, bool showCrosshairs)
+        : size(size), mymousemode(mousemode), scaleVisible(showScale), crosshairsVisible(showCrosshairs)
     {
         layermanager = new LayerManager(this, size);
         screen_middle = QPoint(size.width()/2, size.height()/2);
@@ -180,10 +180,13 @@ namespace qmapcontrol
             }
         }
 
-        painter.drawLine(screen_middle.x(), screen_middle.y()-10,
-                         screen_middle.x(), screen_middle.y()+10); // |
-        painter.drawLine(screen_middle.x()-10, screen_middle.y(),
-                         screen_middle.x()+10, screen_middle.y()); // -
+        if (crosshairsVisible)
+        {
+            painter.drawLine(screen_middle.x(), screen_middle.y()-10,
+                             screen_middle.x(), screen_middle.y()+10); // |
+            painter.drawLine(screen_middle.x()-10, screen_middle.y(),
+                             screen_middle.x()+10, screen_middle.y()); // -
+        }
 
         // int cross_x = int(layermanager->getMapmiddle_px().x())%256;
         // int cross_y = int(layermanager->getMapmiddle_px().y())%256;
@@ -398,9 +401,14 @@ namespace qmapcontrol
         ImageManager::instance()->setProxy(host, port);
     }
 
-    void MapControl::showScale(bool show)
+    void MapControl::showScale(bool visible)
     {
-        scaleVisible = show;
+        scaleVisible = visible;
+    }
+
+    void MapControl::showCrosshairs(bool visible)
+    {
+        crosshairsVisible = visible;
     }
 
     void MapControl::resize(const QSize newSize)

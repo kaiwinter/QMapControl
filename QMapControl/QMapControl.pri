@@ -17,6 +17,7 @@ HEADERS += curve.h \
            tilemapadapter.h \
            wmsmapadapter.h \
            circlepoint.h \
+           arrowpoint.h \
            imagepoint.h \
            gps_position.h \
            osmmapadapter.h \
@@ -41,6 +42,7 @@ SOURCES += curve.cpp \
            tilemapadapter.cpp \
            wmsmapadapter.cpp \
            circlepoint.cpp \
+           arrowpoint.cpp \
            imagepoint.cpp \
            gps_position.cpp \
            osmmapadapter.cpp \

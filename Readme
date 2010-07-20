@@ -20,7 +20,7 @@ Feature list:
 - Added objects emit signals on clicks
 - The map navigation is customizable (using styles and/or keys)
 - GPS parser included for reading gllin output
-- Tested on the FIC Neo1973 (and Linux/Windows)
+- Tested on the FIC Neo1973, Nokia N900 (and Linux/Windows)
 
 Compiling the sample application for i386:
 ==========================================
