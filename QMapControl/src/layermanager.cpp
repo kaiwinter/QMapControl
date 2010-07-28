@@ -141,6 +141,9 @@ namespace qmapcontrol
         {
             setMiddle(coordinates);
             zoomIn();
+            // bugfix Tl
+            // if points are too close -> Loop of death...
+            if (17 == layer()->mapadapter()->currentZoom()) break;
         }
 
 
