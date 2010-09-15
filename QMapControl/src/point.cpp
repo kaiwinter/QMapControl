@@ -29,7 +29,7 @@ namespace qmapcontrol
     Point::Point()
     {}
     Point::Point(const Point& point)
-        :Geometry(point.name()), X(point.longitude()), Y(point.latitude())
+            :Geometry(point.name()), X(point.longitude()), Y(point.latitude())
     {
         visible = point.isVisible();
         mywidget = 0;
@@ -41,7 +41,7 @@ namespace qmapcontrol
     }
 
     Point::Point(qreal x, qreal y, QString name, enum Alignment alignment)
-        : Geometry(name), X(x), Y(y), myalignment(alignment)
+            : Geometry(name), X(x), Y(y), myalignment(alignment)
     {
         GeometryType = "Point";
         mywidget = 0;
@@ -53,7 +53,7 @@ namespace qmapcontrol
     }
 
     Point::Point(qreal x, qreal y, QWidget* widget, QString name, enum Alignment alignment)
-        : Geometry(name), X(x), Y(y), mywidget(widget), myalignment(alignment)
+            : Geometry(name), X(x), Y(y), mywidget(widget), myalignment(alignment)
     {
         // Point(x, y, name, alignment);
         GeometryType = "Point";
@@ -66,7 +66,7 @@ namespace qmapcontrol
         mywidget->show();
     }
     Point::Point(qreal x, qreal y, QPixmap* pixmap, QString name, enum Alignment alignment)
-        : Geometry(name), X(x), Y(y), mypixmap(pixmap), myalignment(alignment)
+            : Geometry(name), X(x), Y(y), mypixmap(pixmap), myalignment(alignment)
     {
         GeometryType = "Point";
         mywidget = 0;
@@ -144,8 +144,8 @@ namespace qmapcontrol
             int diffzoom = homelevel-currentzoom;
             int viewheight = size.height();
             int viewwidth = size.width();
-            viewheight = int(viewheight / pow(2, diffzoom));
-            viewwidth = int(viewwidth / pow(2, diffzoom));
+            viewheight = int(viewheight / pow(2.0, diffzoom));
+            viewwidth = int(viewwidth / pow(2.0, diffzoom));
 
             if (minsize.height()!= -1 && viewheight < minsize.height())
                 viewheight = minsize.height();

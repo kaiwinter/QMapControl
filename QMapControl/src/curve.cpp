@@ -27,7 +27,7 @@
 namespace qmapcontrol
 {
     Curve::Curve(QString name)
-        : Geometry(name)
+            : Geometry(name)
     {
     }
 

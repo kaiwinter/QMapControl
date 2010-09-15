@@ -26,6 +26,7 @@
 #ifndef OPENAERIALMAPADAPTER_H
 #define OPENAERIALMAPADAPTER_H
 
+#include "qmapcontrol_global.h"
 #include "tilemapadapter.h"
 namespace qmapcontrol
 {
@@ -34,7 +35,7 @@ namespace qmapcontrol
      * This is a conveniece class, which extends and configures a TileMapAdapter. Source of maps is http://www.openaerialmap.org/
      *	@author Kai Winter <kaiwinter@gmx.de>
      */
-    class OpenAerialMapAdapter : public TileMapAdapter
+    class QMAPCONTROL_EXPORT OpenAerialMapAdapter : public TileMapAdapter
     {
         Q_OBJECT
                 public:

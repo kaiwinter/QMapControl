@@ -27,6 +27,7 @@
 #define POINT_H
 #include <QWidget>
 
+#include "qmapcontrol_global.h"
 #include "geometry.h"
 
 namespace qmapcontrol
@@ -54,7 +55,7 @@ namespace qmapcontrol
      *
      * @author Kai Winter <kaiwinter@gmx.de>
      */
-    class Point : public Geometry
+    class QMAPCONTROL_EXPORT Point : public Geometry
     {
         Q_OBJECT
 

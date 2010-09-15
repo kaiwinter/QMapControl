@@ -1,10 +1,10 @@
 include(../../QMapControl.pri)
+QT+=network
+DEPENDPATH += src
 MOC_DIR = tmp
 OBJECTS_DIR = obj
-DESTDIR = bin
+DESTDIR = ../bin
 TARGET = Citymap
-DEPENDPATH += . ../../src
-INCLUDEPATH += . ../../src
 
 # Input
 SOURCES += citymap.cpp \
@@ -12,5 +12,3 @@ SOURCES += citymap.cpp \
  dialogs.cpp
 HEADERS += citymap.h \
  dialogs.h
-
-QT+=network

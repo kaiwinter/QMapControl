@@ -27,7 +27,7 @@
 namespace qmapcontrol
 {
     Geometry::Geometry(QString name)
-        : GeometryType("Geometry"), myparentGeometry(0), mypen(0), visible(true), myname(name)
+            : GeometryType("Geometry"), myparentGeometry(0), mypen(0), visible(true), myname(name)
     {
     }
 

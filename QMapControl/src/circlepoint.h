@@ -26,6 +26,7 @@
 #ifndef CIRCLEPOINT_H
 #define CIRCLEPOINT_H
 
+#include "qmapcontrol_global.h"
 #include "point.h"
 
 namespace qmapcontrol
@@ -37,7 +38,7 @@ namespace qmapcontrol
      *
      * @author Kai Winter <kaiwinter@gmx.de>
      */
-    class CirclePoint : public Point
+    class QMAPCONTROL_EXPORT CirclePoint : public Point
     {
     public:
         //!

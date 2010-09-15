@@ -25,6 +25,8 @@
 
 #ifndef GEOMETRY_H
 #define GEOMETRY_H
+
+#include "qmapcontrol_global.h"
 #include <QObject>
 #include <QPainter>
 #include <QDebug>
@@ -43,7 +45,7 @@ namespace qmapcontrol
      *
      *	@author Kai Winter <kaiwinter@gmx.de>
      */
-    class Geometry : public QObject
+    class QMAPCONTROL_EXPORT Geometry : public QObject
     {
         friend class LineString;
         Q_OBJECT

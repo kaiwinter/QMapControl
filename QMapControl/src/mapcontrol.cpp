@@ -27,7 +27,7 @@
 namespace qmapcontrol
 {
     MapControl::MapControl(QSize size, MouseMode mousemode, bool showScale, bool showCrosshairs)
-        : size(size), mymousemode(mousemode), scaleVisible(showScale), crosshairsVisible(showCrosshairs)
+            : size(size), mymousemode(mousemode), scaleVisible(showScale), crosshairsVisible(showCrosshairs)
     {
         layermanager = new LayerManager(this, size);
         screen_middle = QPoint(size.width()/2, size.height()/2);
@@ -155,7 +155,7 @@ namespace qmapcontrol
             if (currentZoom() >= 0 && distanceList.size() > currentZoom())
             {
                 double line;
-                line = distanceList.at( currentZoom() ) / pow(2, 18-currentZoom() ) / 0.597164;
+                line = distanceList.at( currentZoom() ) / pow(2.0, 18-currentZoom() ) / 0.597164;
 
                 // draw the scale
                 painter.setPen(Qt::black);
@@ -280,6 +280,19 @@ namespace qmapcontrol
 
         update();
         // emit(mouseEventCoordinate(evnt, clickToWorldCoordinate(evnt->pos())));
+    }
+
+    void MapControl::wheelEvent(QWheelEvent *evnt)
+    {
+        //this->setView(this->clickToWorldCoordinate(evnt->pos()));
+        if(evnt->delta() > 0)
+        {
+            this->zoomIn();
+        }
+        else
+        {
+            this->zoomOut();
+        }
     }
 
     QPointF MapControl::clickToWorldCoordinate(QPoint click)

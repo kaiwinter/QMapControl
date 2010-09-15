@@ -26,6 +26,7 @@
 #ifndef EMPTYMAPADAPTER_H
 #define EMPTYMAPADAPTER_H
 
+#include "qmapcontrol_global.h"
 #include "mapadapter.h"
 
 namespace qmapcontrol
@@ -36,21 +37,21 @@ namespace qmapcontrol
      * only want to display an image through a FixedImageOverlay e.g.
      *	@author Kai Winter <kaiwinter@gmx.de>
      */
-    class EmptyMapAdapter : public MapAdapter
+    class QMAPCONTROL_EXPORT EmptyMapAdapter : public MapAdapter
     {
-	Q_OBJECT
+        Q_OBJECT
     public:
-	//! Constructor.
+        //! Constructor.
         /*!
-	 * @param tileSize This parameter seems unnecessary for this type of MapAdaper on first sight. But since
-	 * this parameter defines the size of the offscreen image it could be used for a little performance
-	 * tuning (larger offscreen-images have to be redrawed less times).
+         * @param tileSize This parameter seems unnecessary for this type of MapAdaper on first sight. But since
+         * this parameter defines the size of the offscreen image it could be used for a little performance
+         * tuning (larger offscreen-images have to be redrawed less times).
          * @param minZoom the minimum zoom level
          * @param maxZoom the maximum zoom level
          */
-	EmptyMapAdapter(int tileSize = 256, int minZoom = 0, int maxZoom = 17);
+        EmptyMapAdapter(int tileSize = 256, int minZoom = 0, int maxZoom = 17);
 
-	virtual ~EmptyMapAdapter();
+        virtual ~EmptyMapAdapter();
 
         virtual QPoint coordinateToDisplay(const QPointF&) const;
         virtual QPointF displayToCoordinate(const QPoint&) const;

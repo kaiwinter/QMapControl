@@ -26,6 +26,7 @@
 #ifndef LAYER_H
 #define LAYER_H
 
+#include "qmapcontrol_global.h"
 #include <QObject>
 #include <QDebug>
 #include <QPainter>
@@ -56,7 +57,7 @@ namespace qmapcontrol
      *
      *	@author Kai Winter <kaiwinter@gmx.de>
      */
-    class Layer : public QObject
+    class QMAPCONTROL_EXPORT Layer : public QObject
     {
         Q_OBJECT
 
@@ -131,8 +132,8 @@ namespace qmapcontrol
 
         void setMapAdapter(MapAdapter* mapadapter);
 
-        Layer& operator=(const Layer& rhs);
-        Layer(const Layer& old);
+        //Layer& operator=(const Layer& rhs);
+        //Layer(const Layer& old);
 
     private:
         void moveWidgets(const QPoint mapmiddle_px) const;

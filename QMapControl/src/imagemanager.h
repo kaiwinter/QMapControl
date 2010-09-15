@@ -26,6 +26,7 @@
 #ifndef IMAGEMANAGER_H
 #define IMAGEMANAGER_H
 
+#include "qmapcontrol_global.h"
 #include <QObject>
 #include <QPixmapCache>
 #include <QDebug>
@@ -41,9 +42,9 @@ namespace qmapcontrol
     /**
     @author Kai Winter <kaiwinter@gmx.de>
      */
-    class ImageManager : public QObject
+    class QMAPCONTROL_EXPORT ImageManager : public QObject
     {
-        Q_OBJECT;
+        Q_OBJECT
 
     public:
         static ImageManager* instance()
@@ -56,7 +57,7 @@ namespace qmapcontrol
         }
 
         ~ImageManager();
-        
+
         //! returns a QPixmap of the asked image
         /*!
          * If this component doesn´t have the image a network query gets started to load it.

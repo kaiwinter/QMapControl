@@ -26,6 +26,7 @@
 #ifndef WMSMAPADAPTER_H
 #define WMSMAPADAPTER_H
 
+#include "qmapcontrol_global.h"
 #include "mapadapter.h"
 
 namespace qmapcontrol
@@ -35,7 +36,7 @@ namespace qmapcontrol
      * Use this derived MapAdapter to display maps from WMS servers
      *	@author Kai Winter <kaiwinter@gmx.de>
      */
-    class WMSMapAdapter : public MapAdapter
+    class QMAPCONTROL_EXPORT WMSMapAdapter : public MapAdapter
     {
     public:
         //! constructor

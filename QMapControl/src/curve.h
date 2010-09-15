@@ -26,6 +26,7 @@
 #ifndef CURVE_H
 #define CURVE_H
 
+#include "qmapcontrol_global.h"
 #include "geometry.h"
 #include "point.h"
 
@@ -42,7 +43,7 @@ namespace qmapcontrol
      * LineString, which uses a linear interpolation between Points."
      *	@author Kai Winter <kaiwinter@gmx.de>
      */
-    class Curve : public Geometry
+    class QMAPCONTROL_EXPORT Curve : public Geometry
     {
         Q_OBJECT
     public:

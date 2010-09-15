@@ -27,7 +27,7 @@
 namespace qmapcontrol
 {
     LayerManager::LayerManager(MapControl* mapcontrol, QSize size)
-        :mapcontrol(mapcontrol), scroll(QPoint(0,0)), size(size), whilenewscroll(QPoint(0,0))
+            :mapcontrol(mapcontrol), scroll(QPoint(0,0)), size(size), whilenewscroll(QPoint(0,0))
     {
         // genauer berechnen?
         offSize = size *2;

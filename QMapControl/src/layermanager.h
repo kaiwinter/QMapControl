@@ -26,6 +26,7 @@
 #ifndef LAYERMANAGER_H
 #define LAYERMANAGER_H
 
+#include "qmapcontrol_global.h"
 #include <QObject>
 #include <QMap>
 #include <QListIterator>
@@ -48,7 +49,7 @@ namespace qmapcontrol
      * It initiates the creation of a new offscreen image and on zooming the zoom images gets here created.
      *	@author Kai Winter <kaiwinter@gmx.de>
      */
-    class LayerManager : public QObject
+    class QMAPCONTROL_EXPORT LayerManager : public QObject
     {
         Q_OBJECT
 

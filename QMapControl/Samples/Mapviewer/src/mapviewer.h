@@ -2,7 +2,9 @@
 #define MAPVIEWER_H
 
 #include <QtGui>
-#include "../../../qmapcontrol.h"
+#include <mapcontrol.h>
+#include <osmmapadapter.h>
+#include <maplayer.h>
 using namespace qmapcontrol;
 class Mapviewer : public QMainWindow
 {

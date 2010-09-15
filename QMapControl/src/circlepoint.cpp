@@ -27,7 +27,7 @@
 namespace qmapcontrol
 {
     CirclePoint::CirclePoint(qreal x, qreal y, int radius, QString name, Alignment alignment, QPen* pen)
-        : Point(x, y, name, alignment)
+            : Point(x, y, name, alignment)
     {
         size = QSize(radius, radius);
         mypen = pen;
@@ -36,7 +36,7 @@ namespace qmapcontrol
     }
 
     CirclePoint::CirclePoint(qreal x, qreal y, QString name, Alignment alignment, QPen* pen)
-        : Point(x, y, name, alignment)
+            : Point(x, y, name, alignment)
     {
         int radius = 10;
         size = QSize(radius, radius);

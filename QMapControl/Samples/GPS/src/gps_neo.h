@@ -3,7 +3,7 @@
 
 #include <QObject>
 #include <QtGui>
-#include "../../../qmapcontrol.h"
+#include <gps_position.h>
 //! A parser for the NMEA data format
 /*!
  * This class parses gps data from the Neo´s gllin service, which you have to start manually
@@ -14,23 +14,23 @@
 using namespace qmapcontrol;
 class GPS_Neo: public QObject
 {
-	Q_OBJECT
-	public:
-		GPS_Neo(QObject *parent = 0);
-		~GPS_Neo();
-		void start();
-		void stop();
-	 
-	private:
-		QList<GPS_Position> positions;
-		GPS_Position process_line(QByteArray line);
-		bool running;
-		
-	signals:
-		void new_position(float, QPointF);
-	
-	public slots:
-		void tick();
+        Q_OBJECT
+        public:
+                GPS_Neo(QObject *parent = 0);
+                ~GPS_Neo();
+                void start();
+                void stop();
+
+        private:
+                QList<GPS_Position> positions;
+                GPS_Position process_line(QByteArray line);
+                bool running;
+
+        signals:
+                void new_position(float, QPointF);
+
+        public slots:
+                void tick();
 };
 
 #endif

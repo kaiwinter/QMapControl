@@ -1,3 +1,8 @@
+2010-09-15
+- Whole project is now a dynamic linked library
+- The project structure was updated caused by the dll approach
+- Zooming in maps via mousewheel was added
+
 2010-07-19
 - Added new ArrowPoint which renders as an arrowhead at a specified (and updateable) heading, providing orientation information for a Point on the map.
 - Made the map-center crosshairs optional via MapControl::showCrosshairs().

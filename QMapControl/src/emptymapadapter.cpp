@@ -27,12 +27,12 @@
 namespace qmapcontrol
 {
     EmptyMapAdapter::EmptyMapAdapter(int tileSize, int minZoom, int maxZoom)
-	:MapAdapter("", "", 256, minZoom, maxZoom)
+            :MapAdapter("", "", 256, minZoom, maxZoom)
     {
         Q_UNUSED(tileSize)
-        PI = acos(-1.0);
+                PI = acos(-1.0);
 
-	numberOfTiles = tilesonzoomlevel(minZoom);
+        numberOfTiles = tilesonzoomlevel(minZoom);
     }
 
     EmptyMapAdapter::~EmptyMapAdapter()
@@ -41,20 +41,20 @@ namespace qmapcontrol
 
     void EmptyMapAdapter::zoom_in()
     {
-	if (current_zoom < max_zoom)
-	{
-	    current_zoom = current_zoom + 1;
+        if (current_zoom < max_zoom)
+        {
+            current_zoom = current_zoom + 1;
         }
-	numberOfTiles = tilesonzoomlevel(current_zoom);
+        numberOfTiles = tilesonzoomlevel(current_zoom);
     }
 
     void EmptyMapAdapter::zoom_out()
     {
-	if (current_zoom > min_zoom)
-	{
-	    current_zoom = current_zoom - 1;
-	}
-	numberOfTiles = tilesonzoomlevel(current_zoom);
+        if (current_zoom > min_zoom)
+        {
+            current_zoom = current_zoom - 1;
+        }
+        numberOfTiles = tilesonzoomlevel(current_zoom);
     }
 
     qreal EmptyMapAdapter::deg_rad(qreal x) const
@@ -69,9 +69,9 @@ namespace qmapcontrol
     QString EmptyMapAdapter::query(int x, int y, int z) const
     {
         Q_UNUSED(x)
-        Q_UNUSED(y)
-        Q_UNUSED(z)
-	return "";
+                Q_UNUSED(y)
+                Q_UNUSED(z)
+                return "";
     }
 
     QPoint EmptyMapAdapter::coordinateToDisplay(const QPointF& coordinate) const
@@ -100,7 +100,9 @@ namespace qmapcontrol
 
         if (x<0 || x>pow(2,z)-1 ||
             y<0 || y>pow(2,z)-1)
-        {
+            if (x<0 || x>pow(2.0,z)-1 ||
+                y<0 || y>pow(2.0,z)-1)
+            {
             return false;
         }
         return true;
@@ -109,6 +111,7 @@ namespace qmapcontrol
     int EmptyMapAdapter::tilesonzoomlevel(int zoomlevel) const
     {
         return int(pow(2, zoomlevel));
+        return int(pow(2.0, zoomlevel));
     }
     int EmptyMapAdapter::xoffset(int x) const
     {
