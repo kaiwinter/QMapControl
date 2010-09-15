@@ -30,7 +30,10 @@ namespace qmapcontrol
     MapNetwork::MapNetwork(ImageManager* parent)
         :parent(parent), http(new QHttp(this)), loaded(0)
     {
-        connect(http, SIGNAL(requestFinished(int, bool)),
+        connect(this->http, SIGNAL(proxyAuthenticationRequired(QNetworkProxy,QAuthenticator*)),
+                this, SLOT(proxyAuthenticationRequired(QNetworkProxy,QAuthenticator*)));
+
+        connect(this->http, SIGNAL(requestFinished(int, bool)),
                 this, SLOT(requestFinished(int, bool)));
     }
 
@@ -113,7 +116,7 @@ namespace qmapcontrol
 
     void MapNetwork::abortLoading()
     {
-	http->clearPendingRequests();
+    http->clearPendingRequests();
         if (vectorMutex.tryLock())
         {
             loadingMap.clear();
@@ -132,5 +135,31 @@ namespace qmapcontrol
         // do not set proxy on qt/extended
         http->setProxy(host, port);
 #endif
+    }
+
+    void MapNetwork::proxyAuthenticationRequired(const QNetworkProxy &proxy, QAuthenticator *authenticator)
+    {
+        qDebug() << "Proxy Aut req" << proxy.hostName() << &authenticator;
+        QDialog dialog;
+        QGridLayout layout;
+        QLabel username, password;
+        username.setText("Username:");
+        password.setText("Password:");
+        layout.addWidget(&username, 0, 0);
+        layout.addWidget(&password, 1, 0);
+        QLineEdit user, pass;
+        pass.setEchoMode(QLineEdit::Password);
+        connect(&user, SIGNAL(returnPressed()), &dialog, SLOT(accept()));
+        connect(&pass, SIGNAL(returnPressed()), &dialog, SLOT(accept()));
+        layout.addWidget(&user, 0, 1);
+        layout.addWidget(&pass, 1, 1);
+        QPushButton button;
+        button.setText("OK");
+        connect(&button, SIGNAL(clicked()), &dialog, SLOT(accept()));
+        layout.addWidget(&button, 2, 0, 1, 2, Qt::AlignCenter);
+        dialog.setLayout(&layout);
+        dialog.exec();
+        authenticator->setUser(user.text());
+        authenticator->setPassword(pass.text());
     }
 }

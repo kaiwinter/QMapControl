@@ -27,7 +27,7 @@
 namespace qmapcontrol
 {
     MapAdapter::MapAdapter(const QString& host, const QString& serverPath, int tilesize, int minZoom, int maxZoom)
-        :myhost(host), serverPath(serverPath), mytilesize(tilesize), min_zoom(minZoom), max_zoom(maxZoom)
+            :myhost(host), serverPath(serverPath), mytilesize(tilesize), min_zoom(minZoom), max_zoom(maxZoom)
     {
         current_zoom = min_zoom;
         loc = QLocale(QLocale::English);

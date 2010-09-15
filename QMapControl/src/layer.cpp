@@ -27,7 +27,7 @@
 namespace qmapcontrol
 {
     Layer::Layer(QString layername, MapAdapter* mapadapter, enum LayerType layertype, bool takeevents)
-        :visible(true), mylayername(layername), mylayertype(layertype), mapAdapter(mapadapter), takeevents(takeevents), myoffscreenViewport(QRect(0,0,0,0))
+            :visible(true), mylayername(layername), mylayertype(layertype), mapAdapter(mapadapter), takeevents(takeevents), myoffscreenViewport(QRect(0,0,0,0))
     {
         //qDebug() << "creating new Layer: " << layername << ", type: " << contents;
         //qDebug() << this->layertype;
@@ -205,16 +205,16 @@ namespace qmapcontrol
         int mapmiddle_tile_x = mapmiddle_px.x()/tilesize;
         int mapmiddle_tile_y = mapmiddle_px.y()/tilesize;
 
-	const QPoint from = QPoint((-tiles_left+mapmiddle_tile_x)*tilesize, (-tiles_above+mapmiddle_tile_y)*tilesize);
-	const QPoint to = QPoint((tiles_right+mapmiddle_tile_x+1)*tilesize, (tiles_bottom+mapmiddle_tile_y+1)*tilesize);
+        const QPoint from = QPoint((-tiles_left+mapmiddle_tile_x)*tilesize, (-tiles_above+mapmiddle_tile_y)*tilesize);
+        const QPoint to = QPoint((tiles_right+mapmiddle_tile_x+1)*tilesize, (tiles_bottom+mapmiddle_tile_y+1)*tilesize);
 
         myoffscreenViewport = QRect(from, to);
 
-	// for the EmptyMapAdapter no tiles should be loaded and painted.
-	if (mapAdapter->host() == "")
-	{
-	    return;
-	}
+        // for the EmptyMapAdapter no tiles should be loaded and painted.
+        if (mapAdapter->host() == "")
+        {
+            return;
+        }
 
         if (mapAdapter->isValid(mapmiddle_tile_x, mapmiddle_tile_y, mapAdapter->currentZoom()))
         {

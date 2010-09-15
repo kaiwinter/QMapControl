@@ -26,6 +26,7 @@
 #ifndef FIXEDIMAGEOVERLAY_H
 #define FIXEDIMAGEOVERLAY_H
 
+#include "qmapcontrol_global.h"
 #include "imagepoint.h"
 
 namespace qmapcontrol
@@ -39,11 +40,11 @@ namespace qmapcontrol
      *
      * @author Kai Winter <kaiwinter@gmx.de>
      */
-    class FixedImageOverlay : public ImagePoint
+    class QMAPCONTROL_EXPORT FixedImageOverlay : public ImagePoint
     {
     public:
-       //! Creates an image overlay which loads and displays the given image file
-       /*!
+        //! Creates an image overlay which loads and displays the given image file
+        /*!
         * Use this contructor to load the given image file and let the point
         * display it.
         * When you want multiple points to display the same image, use the
@@ -57,8 +58,8 @@ namespace qmapcontrol
         */
         FixedImageOverlay(qreal x_upperleft, qreal y_upperleft, qreal x_lowerright, qreal y_lowerright, QString filename, QString name = QString());
 
-       //! Creates an image overlay which displays the given image
-       /*!
+        //! Creates an image overlay which displays the given image
+        /*!
         * Use this contructor to display the given image.
         * @param x_upperleft the coordinate of the upper left corner where the image should be aligned
         * @param y_upperleft the coordinate of the upper left corner where the image should be aligned

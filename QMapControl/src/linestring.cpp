@@ -27,13 +27,13 @@
 namespace qmapcontrol
 {
     LineString::LineString()
-        : Curve()
+            : Curve()
     {
         GeometryType = "LineString";
     }
 
     LineString::LineString(QList<Point*> const points, QString name, QPen* pen)
-        :Curve(name)
+            :Curve(name)
     {
         mypen = pen;
         LineString();

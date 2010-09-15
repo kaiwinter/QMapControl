@@ -28,6 +28,8 @@
 #define ARROWPOINT_H
 
 #include <QBrush>
+
+#include "qmapcontrol_global.h"
 #include "math.h"
 #include "point.h"
 
@@ -40,7 +42,7 @@ namespace qmapcontrol
      *
      * @author Jeffery MacEachern <j.maceachern@gmail.com>
      */
-    class ArrowPoint : public Point
+    class QMAPCONTROL_EXPORT ArrowPoint : public Point
     {
     public:
         //!
@@ -48,7 +50,7 @@ namespace qmapcontrol
          *
          * @param x longitude
          * @param y latitude
-	 * @param sideLength side length of the arrow's bounding box (square)
+         * @param sideLength side length of the arrow's bounding box (square)
          * @param heading compass heading determining direction that arrow faces, measured in degrees clockwise from North
          * @param name name of the arrow point
          * @param alignment alignment (Middle or TopLeft)
@@ -66,9 +68,9 @@ namespace qmapcontrol
         virtual void setPen(QPen* pen);
 
         //! sets the heading of the arrow and redraws it in the new orientation
-	/*!
+        /*!
          * @param heading new heading
-	 */
+         */
         void setHeading(qreal heading);
 
         //! gets the current heading of the arrow

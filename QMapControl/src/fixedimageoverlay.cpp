@@ -27,8 +27,8 @@
 namespace qmapcontrol
 {
     FixedImageOverlay::FixedImageOverlay(qreal x_upperleft, qreal y_upperleft, qreal x_lowerright, qreal y_lowerright, QString filename, QString name)
-        : ImagePoint(x_upperleft, y_upperleft, filename, name, TopLeft),
-                     x_lowerright(x_lowerright), y_lowerright(y_lowerright)
+            : ImagePoint(x_upperleft, y_upperleft, filename, name, TopLeft),
+            x_lowerright(x_lowerright), y_lowerright(y_lowerright)
     {
         //qDebug() << "loading image: " << filename;
         mypixmap = new QPixmap(filename);
@@ -37,14 +37,14 @@ namespace qmapcontrol
     }
 
     FixedImageOverlay::FixedImageOverlay(qreal x_upperleft, qreal y_upperleft, qreal x_lowerright, qreal y_lowerright, QPixmap* pixmap, QString name)
-        : ImagePoint(x_upperleft, y_upperleft, pixmap, name, TopLeft),
-                     x_lowerright(x_lowerright), y_lowerright(y_lowerright)
+            : ImagePoint(x_upperleft, y_upperleft, pixmap, name, TopLeft),
+            x_lowerright(x_lowerright), y_lowerright(y_lowerright)
     {
         mypixmap = pixmap;
         size = mypixmap->size();
     }
 
-    void FixedImageOverlay::draw(QPainter* painter, const MapAdapter* mapadapter, const QRect &viewport, const QPoint offset)
+    void FixedImageOverlay::draw(QPainter* painter, const MapAdapter* mapadapter, const QRect &, const QPoint)
     {
         if (!visible)
             return;

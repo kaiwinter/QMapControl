@@ -26,6 +26,7 @@
 #ifndef LINESTRING_H
 #define LINESTRING_H
 
+#include "qmapcontrol_global.h"
 #include "curve.h"
 
 namespace qmapcontrol
@@ -35,7 +36,7 @@ namespace qmapcontrol
      * A LineString is a Curve with linear interpolation between Points. Each consecutive pair of Points defines a Line segment.
      *	@author Kai Winter <kaiwinter@gmx.de>
      */
-    class LineString : public Curve
+    class QMAPCONTROL_EXPORT LineString : public Curve
     {
         Q_OBJECT
 

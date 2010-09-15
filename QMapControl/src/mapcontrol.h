@@ -26,6 +26,7 @@
 #ifndef MAPCONTROL_H
 #define MAPCONTROL_H
 
+#include "qmapcontrol_global.h"
 #include <QtGui>
 
 #include "layermanager.h"
@@ -50,7 +51,7 @@ namespace qmapcontrol
      *
      * @author Kai Winter <kaiwinter@gmx.de>
      */
-    class MapControl : public QWidget
+    class QMAPCONTROL_EXPORT MapControl : public QWidget
     {
         Q_OBJECT
 
@@ -59,8 +60,8 @@ namespace qmapcontrol
         enum MouseMode
         {
             Panning, /*!< The map is moved */
-            Dragging, /*!< A rectangle can be drawn */
-            None, /*!< Mouse movement events have no effect on the map */
+            Dragging, /*!< A rectangular can be drawn */
+            None /*!< Mouse move events have no efect to the map */
         };
 
         //! The constructor of MapControl
@@ -247,6 +248,7 @@ namespace qmapcontrol
         void mousePressEvent ( QMouseEvent* evnt );
         void mouseReleaseEvent ( QMouseEvent* evnt );
         void mouseMoveEvent ( QMouseEvent* evnt );
+        void wheelEvent( QWheelEvent* evnt );
 
     signals:
         // void mouseEvent(const QMouseEvent* evnt);

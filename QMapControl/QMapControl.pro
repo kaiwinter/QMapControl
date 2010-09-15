@@ -3,4 +3,6 @@
 ######################################################################
 
 TEMPLATE = subdirs
-SUBDIRS += Samples
+SUBDIRS += src \
+Samples
+CONFIG += ordered

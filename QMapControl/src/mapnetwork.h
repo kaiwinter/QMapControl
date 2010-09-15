@@ -26,19 +26,28 @@
 #ifndef MAPNETWORK_H
 #define MAPNETWORK_H
 
+#include "qmapcontrol_global.h"
 #include <QObject>
 #include <QDebug>
 #include <QHttp>
+#include <QNetworkProxy>
+#include <QAuthenticator>
 #include <QVector>
 #include <QPixmap>
+#include <QDialog>
+#include <QLabel>
+#include <QPushButton>
+#include <QLineEdit>
+#include <QGridLayout>
 #include "imagemanager.h"
+
 /**
         @author Kai Winter <kaiwinter@gmx.de>
  */
 namespace qmapcontrol
 {
     class ImageManager;
-    class MapNetwork : QObject
+    class QMAPCONTROL_EXPORT MapNetwork : QObject
     {
         Q_OBJECT
 
@@ -73,6 +82,7 @@ namespace qmapcontrol
 
     private slots:
         void requestFinished(int id, bool error);
+        void proxyAuthenticationRequired(const QNetworkProxy &proxy, QAuthenticator *authenticator);
     };
 }
 #endif
