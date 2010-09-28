@@ -1,6 +1,7 @@
-TARGET = QMapControl
+TARGET = qmapcontrol
 TEMPLATE = lib
 QT += network
+VERSION = 0.9.5.2
 
 DEFINES += QMAPCONTROL_LIBRARY
 
@@ -32,7 +33,7 @@ HEADERS += curve.h \
            openaerialmapadapter.h \
            fixedimageoverlay.h \
            emptymapadapter.h \
-		   arrowpoint.h \
+           arrowpoint.h \
            qmapcontrol_global.h
 SOURCES += curve.cpp \
            geometry.cpp \
@@ -57,5 +58,5 @@ SOURCES += curve.cpp \
            googlesatmapadapter.cpp \
            openaerialmapadapter.cpp \
            fixedimageoverlay.cpp \
-		   arrowpoint.cpp \
+           arrowpoint.cpp \
            emptymapadapter.cpp
