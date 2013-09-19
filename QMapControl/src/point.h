@@ -68,8 +68,10 @@ namespace qmapcontrol
         {
             TopLeft, /*!< Align on TopLeft*/
             TopRight, /*!< Align on TopRight*/
+            TopMiddle, /*!< Align on TopLeft*/
             BottomLeft, /*!< Align on BottomLeft*/
             BottomRight,/*!< Align on BottomRight*/
+            BottomMiddle, /*!< Align on BottomMiddle*/
             Middle /*!< Align on Middle*/
         };
 
@@ -109,7 +111,7 @@ namespace qmapcontrol
          * @param name name of the point
          * @param alignment allignment of the point (Middle or TopLeft)
          */
-        Point(qreal x, qreal y, QPixmap* pixmap, QString name = QString(), enum Alignment alignment = Middle);
+        Point(qreal x, qreal y, QPixmap pixmap, QString name = QString(), enum Alignment alignment = Middle);
         virtual ~Point();
 
         //! returns the bounding box of the point
@@ -151,9 +153,9 @@ namespace qmapcontrol
         /*!
          * @return the pixmap of the point
          */
-        QPixmap* pixmap();
+        QPixmap pixmap();
 
-        //! Sets the zoom level on which the point�s pixmap gets displayed on full size
+        //! Sets the zoom level on which the points pixmap gets displayed on full size
         /*!
          * Use this method to set a zoom level on which the pixmap gets displayed with its real size.
          * On zoomlevels below it will be displayed smaller, and on zoom levels thereover it will be displayed larger
@@ -180,13 +182,15 @@ namespace qmapcontrol
 
         Point::Alignment alignment() const;
 
+        virtual void setPixmap( QPixmap qPixmap );
+
     protected:
         qreal X;
         qreal Y;
         QSize size;
 
         QWidget* mywidget;
-        QPixmap* mypixmap;
+        QPixmap mypixmap;
         Alignment myalignment;
         int homelevel;
         QSize displaysize;

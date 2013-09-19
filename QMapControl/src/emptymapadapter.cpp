@@ -32,7 +32,7 @@ namespace qmapcontrol
         Q_UNUSED(tileSize)
                 PI = acos(-1.0);
 
-        numberOfTiles = tilesonzoomlevel(minZoom);
+        mNumberOfTiles = tilesonzoomlevel(minZoom);
     }
 
     EmptyMapAdapter::~EmptyMapAdapter()
@@ -41,20 +41,20 @@ namespace qmapcontrol
 
     void EmptyMapAdapter::zoom_in()
     {
-        if (current_zoom < max_zoom)
+        if (mCurrent_zoom < mMax_zoom)
         {
-            current_zoom = current_zoom + 1;
+            mCurrent_zoom = mCurrent_zoom + 1;
         }
-        numberOfTiles = tilesonzoomlevel(current_zoom);
+        mNumberOfTiles = tilesonzoomlevel(mCurrent_zoom);
     }
 
     void EmptyMapAdapter::zoom_out()
     {
-        if (current_zoom > min_zoom)
+        if (mCurrent_zoom > mMin_zoom)
         {
-            current_zoom = current_zoom - 1;
+            mCurrent_zoom = mCurrent_zoom - 1;
         }
-        numberOfTiles = tilesonzoomlevel(current_zoom);
+        mNumberOfTiles = tilesonzoomlevel(mCurrent_zoom);
     }
 
     qreal EmptyMapAdapter::deg_rad(qreal x) const
@@ -76,16 +76,16 @@ namespace qmapcontrol
 
     QPoint EmptyMapAdapter::coordinateToDisplay(const QPointF& coordinate) const
     {
-        qreal x = (coordinate.x()+180) * (numberOfTiles*mytilesize)/360.; // coord to pixel!
-        qreal y = (1-(log(tan(PI/4+deg_rad(coordinate.y())/2)) /PI)) /2  * (numberOfTiles*mytilesize);
+        qreal x = (coordinate.x()+180) * (mNumberOfTiles*mTileSize)/360.; // coord to pixel!
+        qreal y = (1-(log(tan(PI/4+deg_rad(coordinate.y())/2)) /PI)) /2  * (mNumberOfTiles*mTileSize);
 
         return QPoint(int(x), int(y));
     }
 
     QPointF EmptyMapAdapter::displayToCoordinate(const QPoint& point) const
     {
-        qreal longitude = (point.x()*(360/(numberOfTiles*mytilesize)))-180;
-        qreal latitude = rad_deg(atan(sinh((1-point.y()*(2/(numberOfTiles*mytilesize)))*PI)));
+        qreal longitude = (point.x()*(360/(mNumberOfTiles*mTileSize)))-180;
+        qreal latitude = rad_deg(atan(sinh((1-point.y()*(2/(mNumberOfTiles*mTileSize)))*PI)));
 
         return QPointF(longitude, latitude);
 
@@ -93,9 +93,9 @@ namespace qmapcontrol
 
     bool EmptyMapAdapter::isValid(int x, int y, int z) const
     {
-        if (max_zoom < min_zoom)
+        if (mMax_zoom < mMin_zoom)
         {
-            z= min_zoom - z;
+            z= mMin_zoom - z;
         }
 
         if (x<0 || x>pow(2.0,z)-1 ||

@@ -31,7 +31,10 @@
 namespace qmapcontrol
 {
     MapNetwork::MapNetwork(ImageManager* parent)
-        :parent(parent), http(new QHttp(this)), loaded(0)
+        :   parent(parent), 
+            http(new QHttp(this)), 
+            loaded(0), 
+            networkActive( false )
     {
         connect(this->http, SIGNAL(proxyAuthenticationRequired(QNetworkProxy,QAuthenticator*)),
                 this, SLOT(proxyAuthenticationRequired(QNetworkProxy,QAuthenticator*)));
@@ -49,11 +52,25 @@ namespace qmapcontrol
 
     void MapNetwork::loadImage(const QString& host, const QString& url)
     {
-        // qDebug() << "getting: " << QString(host).append(url);
-        // http->setHost(host);
-        // int getId = http->get(url);
+        QString hostName = host;
+        QString portNumber = QString("80");
 
-        http->setHost(host);
+        QRegExp r(".:.");
+        
+        if(r.indexIn(host) >= 0)
+        {
+            QStringList s = host.split(":");
+
+            hostName = s.at(0);
+            portNumber = s.at(1);
+            
+            http->setHost(hostName, portNumber.toInt());
+        }
+        else
+        {
+            http->setHost(hostName, portNumber.toInt());
+        }
+        
         QHttpRequestHeader header("GET", url);
         header.setValue("User-Agent", "Mozilla");
         header.setValue("Host", host);
@@ -65,30 +82,15 @@ namespace qmapcontrol
 
     void MapNetwork::requestFinished(int id, bool error)
     {
-        // sleep(1);
-        // qDebug() << "MapNetwork::requestFinished" << http->state() << ", id: " << id;
-        if (error)
+        qDebug() << "MapNetwork::requestFinished" << http->state() << ", id: " << id;
+        if (!error)
         {
-            qDebug() << "network error: " << http->errorString();
-            //restart query
-
-        }
-        else
-        {
-
-            QString url;
+            // check if id is in map?
+            if (loadingMap.contains(id))
             {
-                QMutexLocker lock(&vectorMutex);
-                // check if id is in map?
-                if (loadingMap.contains(id))
-                {
-                    url = loadingMap[id];
-                    loadingMap.remove(id);
-                }
-            }
-
-            if(!url.isEmpty())
-            {
+				QMutexLocker lock(&vectorMutex);
+                QString url = loadingMap[id];
+                loadingMap.remove(id);                
                 // qDebug() << "request finished for id: " << id << ", belongs to: " << notifier.url << endl;
                 QByteArray ax;
 
@@ -103,25 +105,14 @@ namespace qmapcontrol
                         // qDebug() << "Network loaded: " << (loaded);
                         parent->receivedImage(pm, url);
                     }
-                    else
-                    {
-                        qDebug() << "NETWORK_PIXMAP_ERROR: " << ax;
-                    }
                 }
             }
-
         }
 
-        if (loadQueueSize() == 0)
+        if (loadingMap.size() == 0)
         {
             // qDebug () << "all loaded";
             parent->loadingQueueEmpty();
-    }
-
-    int MapNetwork::loadQueueSize() const
-    {
-        QMutexLocker lock(&vectorMutex);
-        return loadingMap.size();
         }
     }
 
@@ -139,12 +130,6 @@ namespace qmapcontrol
         return loadingMap.values().contains(url);
     }
 
-    }
-
-    int MapNetwork::loadQueueSize() const
-    {
-        QMutexLocker lock(&vectorMutex);
-        return loadingMap.size();
     void MapNetwork::setProxy(QString host, int port)
     {
 #ifndef Q_WS_QWS

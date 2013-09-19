@@ -74,8 +74,8 @@ namespace qmapcontrol
         else
             order[2][1] = 2;
 
-        int zoom = max_zoom < min_zoom ? min_zoom - current_zoom : current_zoom;
-        numberOfTiles = tilesonzoomlevel(zoom);
+        int zoom = mMax_zoom < mMin_zoom ? mMin_zoom - mCurrent_zoom : mCurrent_zoom;
+        mNumberOfTiles = tilesonzoomlevel(zoom);
         loc.setNumberOptions(QLocale::OmitGroupSeparator);
     }
 
@@ -85,36 +85,36 @@ namespace qmapcontrol
     //TODO: pull out
     void TileMapAdapter::zoom_in()
     {
-        if (min_zoom > max_zoom)
+        if (mMin_zoom > mMax_zoom)
         {
-            //current_zoom = current_zoom-1;
-            current_zoom = current_zoom > max_zoom ? current_zoom-1 : max_zoom;
+            //mCurrent_zoom = mCurrent_zoom-1;
+            mCurrent_zoom = mCurrent_zoom > mMax_zoom ? mCurrent_zoom-1 : mMax_zoom;
         }
-        else if (min_zoom < max_zoom)
+        else if (mMin_zoom < mMax_zoom)
         {
-            //current_zoom = current_zoom+1;
-            current_zoom = current_zoom < max_zoom ? current_zoom+1 : max_zoom;
+            //mCurrent_zoom = mCurrent_zoom+1;
+            mCurrent_zoom = mCurrent_zoom < mMax_zoom ? mCurrent_zoom+1 : mMax_zoom;
         }
 
-        int zoom = max_zoom < min_zoom ? min_zoom - current_zoom : current_zoom;
-        numberOfTiles = tilesonzoomlevel(zoom);
+        int zoom = mMax_zoom < mMin_zoom ? mMin_zoom - mCurrent_zoom : mCurrent_zoom;
+        mNumberOfTiles = tilesonzoomlevel(zoom);
 
     }
     void TileMapAdapter::zoom_out()
     {
-        if (min_zoom > max_zoom)
+        if (mMin_zoom > mMax_zoom)
         {
-            //current_zoom = current_zoom+1;
-            current_zoom = current_zoom < min_zoom ? current_zoom+1 : min_zoom;
+            //mCurrent_zoom = mCurrent_zoom+1;
+            mCurrent_zoom = mCurrent_zoom < mMin_zoom ? mCurrent_zoom+1 : mMin_zoom;
         }
-        else if (min_zoom < max_zoom)
+        else if (mMin_zoom < mMax_zoom)
         {
-            //current_zoom = current_zoom-1;
-            current_zoom = current_zoom > min_zoom ? current_zoom-1 : min_zoom;
+            //mCurrent_zoom = mCurrent_zoom-1;
+            mCurrent_zoom = mCurrent_zoom > mMin_zoom ? mCurrent_zoom-1 : mMin_zoom;
         }
 
-        int zoom = max_zoom < min_zoom ? min_zoom - current_zoom : current_zoom;
-        numberOfTiles = tilesonzoomlevel(zoom);
+        int zoom = mMax_zoom < mMin_zoom ? mMin_zoom - mCurrent_zoom : mCurrent_zoom;
+        mNumberOfTiles = tilesonzoomlevel(zoom);
     }
 
     qreal TileMapAdapter::deg_rad(qreal x) const
@@ -132,24 +132,24 @@ namespace qmapcontrol
         y = yoffset(y);
 
         int a[3] = {z, x, y};
-        return QString(serverPath).replace(order[2][0],2, loc.toString(a[order[2][1]]))
+        return QString(serverPath().replace(order[2][0],2, loc.toString(a[order[2][1]]))
                 .replace(order[1][0],2, loc.toString(a[order[1][1]]))
-                .replace(order[0][0],2, loc.toString(a[order[0][1]]));
+                .replace(order[0][0],2, loc.toString(a[order[0][1]])));
 
     }
 
     QPoint TileMapAdapter::coordinateToDisplay(const QPointF& coordinate) const
     {
-        qreal x = (coordinate.x()+180) * (numberOfTiles*mytilesize)/360.; // coord to pixel!
-        qreal y = (1-(log(tan(PI/4+deg_rad(coordinate.y())/2)) /PI)) /2  * (numberOfTiles*mytilesize);
+        qreal x = (coordinate.x()+180) * (mNumberOfTiles*mTileSize)/360.; // coord to pixel!
+        qreal y = (1-(log(tan(PI/4+deg_rad(coordinate.y())/2)) /PI)) /2  * (mNumberOfTiles*mTileSize);
 
         return QPoint(int(x), int(y));
     }
 
     QPointF TileMapAdapter::displayToCoordinate(const QPoint& point) const
     {
-        qreal longitude = (point.x()*(360/(numberOfTiles*mytilesize)))-180;
-        qreal latitude = rad_deg(atan(sinh((1-point.y()*(2/(numberOfTiles*mytilesize)))*PI)));
+        qreal longitude = (point.x()*(360/(mNumberOfTiles*mTileSize)))-180;
+        qreal latitude = rad_deg(atan(sinh((1-point.y()*(2/(mNumberOfTiles*mTileSize)))*PI)));
 
         return QPointF(longitude, latitude);
 
@@ -157,9 +157,9 @@ namespace qmapcontrol
 
     bool TileMapAdapter::isValid(int x, int y, int z) const
     {
-        if (max_zoom < min_zoom)
+        if (mMax_zoom < mMin_zoom)
         {
-            z= min_zoom - z;
+            z= mMin_zoom - z;
         }
 
         if (x<0 || x>pow(2.0,z)-1 ||

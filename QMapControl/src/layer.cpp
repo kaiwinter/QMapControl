@@ -47,6 +47,8 @@ namespace qmapcontrol
         //mat.rotate(45);
         //mat.translate(-480/2,-640/2);
         //screenmiddle = mat.map(screenmiddle);
+
+        emit(updateRequest());
     }
 
     QString Layer::layername() const
@@ -54,7 +56,7 @@ namespace qmapcontrol
         return mylayername;
     }
 
-    const MapAdapter* Layer::mapadapter() const
+    MapAdapter* Layer::mapadapter()
     {
         return mapAdapter;
     }
@@ -65,8 +67,17 @@ namespace qmapcontrol
         emit(updateRequest());
     }
 
+    bool Layer::containsGeometry( Geometry* geometry )
+    {
+        return geometry && geometries.contains( geometry );
+    }
+
     void Layer::addGeometry(Geometry* geom)
     {
+        if ( !geom || containsGeometry( geom ) )
+        {
+            return;
+        }
         //qDebug() << geom->getName() << ", " << geom->getPoints().at(0)->getWidget();
 
         geometries.append(geom);
@@ -75,22 +86,29 @@ namespace qmapcontrol
         connect(geom, SIGNAL(updateRequest(QRectF)),
                 this, SIGNAL(updateRequest(QRectF)));
     }
+
     void Layer::removeGeometry(Geometry* geometry)
     {
-        for (int i=0; i<geometries.count(); i++)
+        if ( !geometry )
         {
-            if (geometry == geometries.at(i))
+            return;
+        }
+
+        foreach( Geometry* geo, geometries )
+        {
+            if ( geo && geo == geometry )
             {
                 disconnect(geometry);
-                geometries.removeAt(i);
-                //delete geometry;
+                geometries.removeAll( geometry );
             }
         }
+        emit(updateRequest(geometry->boundingBox()));
     }
 
     void Layer::clearGeometries()
     {
-        foreach(Geometry *geometry, geometries){
+        foreach(Geometry *geometry, geometries)
+        {
             disconnect(geometry);
         }
         geometries.clear();
@@ -113,7 +131,9 @@ namespace qmapcontrol
     {
         if (takesMouseEvents())
         {
-            if (evnt->button() == Qt::LeftButton && evnt->type() == QEvent::MouseButtonPress)
+            if ( geometries.size() > 0 &&
+                 evnt->button() == Qt::LeftButton &&
+                 evnt->type() == QEvent::MouseButtonPress)
             {
                 // check for collision
                 QPointF c = mapAdapter->displayToCoordinate(QPoint(evnt->x()-screenmiddle.x()+mapmiddle_px.x(),
@@ -164,9 +184,9 @@ namespace qmapcontrol
             offset = mapmiddle_px-screenmiddle;
 
         painter->translate(-mapmiddle_px+screenmiddle);
-        for (int i=0; i<geometries.count(); i++)
+        foreach( Geometry* geometry, geometries )
         {
-            geometries.at(i)->draw(painter, mapAdapter, viewport, offset);
+            geometry->draw(painter, mapAdapter, viewport, offset);
         }
         painter->translate(mapmiddle_px-screenmiddle);
 
@@ -281,15 +301,14 @@ namespace qmapcontrol
 
     void Layer::moveWidgets(const QPoint mapmiddle_px) const
     {
-        for (int i=0; i<geometries.count(); i++)
+        foreach( Geometry* geometry, geometries )
         {
-            const Geometry* geom = geometries.at(i);
-            if (geom->GeometryType == "Point")
+            if (geometry->GeometryType == "Point")
             {
-                if (((Point*)geom)->widget()!=0)
+                if (((Point*)geometry)->widget()!=0)
                 {
                     QPoint topleft_relative = QPoint(mapmiddle_px-screenmiddle);
-                    ((Point*)geom)->drawWidget(mapAdapter, topleft_relative);
+                    ((Point*)geometry)->drawWidget(mapAdapter, topleft_relative);
                 }
             }
         }
@@ -301,7 +320,7 @@ namespace qmapcontrol
 
     void Layer::setMapAdapter(MapAdapter* mapadapter)
     {
-
         mapAdapter = mapadapter;
+        emit(updateRequest());
     }
 }

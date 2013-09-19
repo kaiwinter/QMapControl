@@ -24,20 +24,37 @@
 */
 
 #include "imagemanager.h"
+#include <QCryptographicHash>
+#include <QPainter>
+
 namespace qmapcontrol
 {
     ImageManager* ImageManager::m_Instance = 0;
     ImageManager::ImageManager(QObject* parent)
-            :QObject(parent), emptyPixmap(QPixmap(1,1)), net(new MapNetwork(this)), doPersistentCaching(false)
+            : QObject(parent),
+              emptyPixmap(QPixmap(1,1)),
+              loadingPixmap(QPixmap(256,256)),
+              net(new MapNetwork(this)),
+              doPersistentCaching(false)
     {
         emptyPixmap.fill(Qt::transparent);
+        
+        //initialize loading image
+        loadingPixmap.fill( Qt::white );
+        QPainter paint(&loadingPixmap);
+        QBrush brush( Qt::lightGray, Qt::Dense5Pattern );
+        paint.fillRect(loadingPixmap.rect(), brush );
+        
+        brush.setColor( Qt::black );
+        paint.drawText( 10, 10, "LOADING..." );
+
+        paint.end();
 
         if (QPixmapCache::cacheLimit() <= 20000)
         {
             QPixmapCache::setCacheLimit(20000);	// in kB
         }
     }
-
 
     ImageManager::~ImageManager()
     {
@@ -52,27 +69,46 @@ namespace qmapcontrol
     {
         //qDebug() << "ImageManager::getImage";
         QPixmap pm;
-        //pm.fill(Qt::black);
 
-        //is image cached (memory) or currently loading?
-        if (!QPixmapCache::find(url, pm) && !net->imageIsLoading(url))
-            //	if (!images.contains(url) && !net->imageIsLoading(url))
+        if ( net->imageIsLoading(url) )
         {
-            //image cached (persistent)?
-            if (doPersistentCaching && tileExist(url))
+            //currently loading an image
+            return loadingPixmap;
+        }
+        else if ( QPixmapCache::find( md5hex(url), &pm) )
+        {
+           //image found in cache, use this version
+            return pm;
+        }
+        else if ( doPersistentCaching ) //image disk-caching (persistent) enabled 
+                  
+        {
+            if ( tileExist(url) && 
+                  !tileCacheExpired(url) )
             {
                 loadTile(url,pm);
-                QPixmapCache::insert(url, pm);
+                QPixmapCache::insert(md5hex(url), pm);
+                return pm;
             }
             else
             {
-                //load from net, add empty image
+                //no file yet, go and request an image
                 net->loadImage(host, url);
-                //QPixmapCache::insert(url, emptyPixmap);
-                return emptyPixmap;
             }
         }
-        return pm;
+        //is image cached (memory)
+        else if ( QPixmapCache::find(md5hex(url), &pm) && 
+                  !pm.isNull() )
+        {
+            //we had a valid copy cached in memory (not disk) so return this
+            return pm;
+        }
+        else
+        {
+            //load from net, add empty image
+            net->loadImage(host, url);
+        }
+        return emptyPixmap;
     }
 
     QPixmap ImageManager::prefetchImage(const QString& host, const QString& url)
@@ -90,14 +126,12 @@ namespace qmapcontrol
     void ImageManager::receivedImage(const QPixmap pixmap, const QString& url)
     {
         //qDebug() << "ImageManager::receivedImage";
-        QPixmapCache::insert(url, pixmap);
-        //images[url] = pixmap;
+        QPixmapCache::insert(md5hex(url), pixmap);
 
-        // needed?
-        if (doPersistentCaching && !tileExist(url) )
+        if (doPersistentCaching && !tileExist(url))
+        {
             saveTile(url,pixmap);
-
-        //((Layer*)this->parent())->imageReceived();
+        }
 
         if (!prefetch.contains(url))
         {
@@ -110,6 +144,11 @@ namespace qmapcontrol
             prefetch.remove(prefetch.indexOf(url));
 #endif
         }
+    }
+
+    QString ImageManager::md5hex( QString qUrl )
+    {
+        return QString( QCryptographicHash::hash( qUrl.toUtf8(), QCryptographicHash::Md5).toHex() );
     }
 
     void ImageManager::loadingQueueEmpty()
@@ -129,18 +168,14 @@ namespace qmapcontrol
         net->setProxy(host, port);
     }
 
-    void ImageManager::setCacheDir(const QDir& path)
+    void ImageManager::setCacheDir(int expiry, const QDir& path)
     {
         doPersistentCaching = true;
+        cachedTileExpiry = expiry;
         cacheDir = path;
         if (!cacheDir.exists())
         {
             cacheDir.mkpath(cacheDir.absolutePath());
-    }
-
-    int ImageManager::loadQueueSize() const
-    {
-        return net->loadQueueSize();
         }
     }
 
@@ -148,7 +183,7 @@ namespace qmapcontrol
     {
         tileName.replace("/","-");
 
-        QFile file(cacheDir.absolutePath() + "/" + tileName.toAscii().toBase64());
+        QFile file(cacheDir.absolutePath() + "/" + md5hex(tileName) );
 
         //qDebug() << "writing: " << file.fileName();
         if (!file.open(QIODevice::ReadWrite )){
@@ -167,7 +202,7 @@ namespace qmapcontrol
     bool ImageManager::loadTile(QString tileName,QPixmap &tileData)
     {
         tileName.replace("/","-");
-        QFile file(cacheDir.absolutePath() + "/" + tileName.toAscii().toBase64());
+        QFile file(cacheDir.absolutePath() + "/" + md5hex(tileName) );
         if (!file.open(QIODevice::ReadOnly )) {
             return false;
         }
@@ -176,18 +211,34 @@ namespace qmapcontrol
         file.close();
         return true;
     }
+
+    bool ImageManager::tileCacheExpired(QString tileName)
+    {
+        tileName.replace("/","-");
+        QFile file(cacheDir.absolutePath() + "/" + md5hex(tileName) );
+        if (file.exists() && cachedTileExpiry > 0)
+        {
+            QFileInfo fileInfo( file );
+            if ( fileInfo.lastModified().msecsTo( QDateTime::currentDateTime() ) > ( cachedTileExpiry * 1000 * 60 ) )
+            {
+                cacheDir.remove( file.fileName() );
+                return true;
+            }
+        }
+        return false;
+    }
+
     bool ImageManager::tileExist(QString tileName)
     {
         tileName.replace("/","-");
-        QFile file(cacheDir.absolutePath() + "/" + tileName.toAscii().toBase64());
+        QFile file(cacheDir.absolutePath() + "/" + md5hex(tileName) );
         if (file.exists())
+        {
             return true;
+        }
         else
+        {
             return false;
-    }
-
-    int ImageManager::loadQueueSize() const
-    {
-        return net->loadQueueSize();
+        }
     }
 }

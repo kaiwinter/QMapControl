@@ -88,6 +88,13 @@ namespace qmapcontrol
          */
         void addLayer ( Layer* layer );
 
+        //! removes a layer
+        /*!
+         * Removes a layer and redraws existing layers
+         * @param layer the layer which should be removed
+         */
+        void removeLayer ( Layer* layer );
+
         //! returns the layer with the given name
         /*!
          * @param  layername name of the wanted layer
@@ -119,6 +126,21 @@ namespace qmapcontrol
          */
         int currentZoom() const;
 
+        //! update screen
+        void updateView() const;
+
+        //! enable mouse wheel events
+        /*!
+         * @parm enable mouse event
+         */
+        void enableMouseWheelEvents( bool enabled = true );
+
+        //! returns mouse wheel allowed
+        /*!
+         * @return mouse wheel events enabled
+         */
+        bool mouseWheelEventsEnabled();
+        
         //! sets the middle of the map to the given coordinate
         /*!
          * @param  coordinate the coordinate which the view´s middle should be set to
@@ -162,7 +184,7 @@ namespace qmapcontrol
          * See followGeometry().
          * @param geometry the Geometry which should not followed anymore
          */
-        void stopFollowing ( Geometry* geometry );
+        void stopFollowing ( const Geometry* geometry ) const;
 
         //! Smoothly moves the center of the view to the given Coordinate
         /*!
@@ -196,10 +218,10 @@ namespace qmapcontrol
          * persistent (also over application restarts).
          * Tiles are stored in the subdirectory "QMapControl.cache" within the
          * user's home directory. This can be changed by giving a path.
+         * @param tileExpiry how long to keep in cache before requesting a new image. 0 or -1 to disable and keep forever
          * @param path the path to the cache directory
          */
-        void enablePersistentCache ( const QDir& path=QDir::homePath() + "/QMapControl.cache" );
-
+        void enablePersistentCache ( int tileExpiry = -1, const QDir& path= QDir::homePath() + "/QMapControl.cache" );
 
         //! Sets the proxy for HTTP connections
         /*!
@@ -219,6 +241,34 @@ namespace qmapcontrol
 
         void showCrosshairs ( bool visible );
 
+        //! Set whether to enable a view bounding box
+        /*!
+         *
+         * @param usebounds enable/disable use of bounding box
+         */
+        void setUseBoundingBox( bool usebounds );
+
+        //! Check if bounding box is being used
+        /*!
+         *
+         * @return if bounding box is being used
+         */
+        bool isBoundingBoxEnabled();
+
+        //! Set constraints for bounding box
+        /*!
+         *
+         * @param rect specified bounds for view to stay within
+         */
+        void setBoundingBox( QRectF &rect );
+
+        //! Get current bounding box
+        /*!
+         *
+         * @return bounding box
+         */
+        QRectF getBoundingBox();
+
     private:
         LayerManager* layermanager;
         QPoint screen_middle; // middle of the widget (half size)
@@ -228,6 +278,7 @@ namespace qmapcontrol
 
         QSize size; // size of the widget
 
+        bool mouse_wheel_events;
         bool mousepressed;
         MouseMode mymousemode;
         bool scaleVisible;
@@ -283,7 +334,7 @@ namespace qmapcontrol
          * @param coordinate The current coordinate
          * @param zoom The current zoom
          */
-        void viewChanged ( const QPointF &coordinate, int zoom );
+        void viewChanged ( const QPointF &coordinate, int zoom ) const;
 
     public slots:
         //! zooms in one step
@@ -330,7 +381,7 @@ namespace qmapcontrol
          * @param newSize The new size
          */
         void resize(const QSize newSize);
-
+        
     private slots:
         void tick();
         void loadingFinished();

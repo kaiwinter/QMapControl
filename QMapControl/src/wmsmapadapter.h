@@ -52,8 +52,10 @@ namespace qmapcontrol
         WMSMapAdapter(QString host, QString serverPath, int tilesize = 256);
         virtual ~WMSMapAdapter();
 
+        virtual QString serverPath() const;
         virtual QPoint coordinateToDisplay(const QPointF&) const;
         virtual QPointF displayToCoordinate(const QPoint&) const;
+        virtual void changeHostAddress( const QString qHost, const QString qServerPath = QString() );
 
     protected:
         virtual void zoom_in();
@@ -66,6 +68,9 @@ namespace qmapcontrol
 
         qreal coord_per_x_tile;
         qreal coord_per_y_tile;
+        
+        QHash<QString,QString> mServerOptions;
+        QHash<int,qreal>    mResolutions;
     };
 }
 #endif

@@ -64,7 +64,7 @@ namespace qmapcontrol
          * @param name the name of the image point
          * @param alignment alignment (Middle or TopLeft)
          */
-        ImagePoint(qreal x, qreal y, QPixmap* pixmap, QString name = QString(), Alignment alignment = Middle);
+        ImagePoint(qreal x, qreal y, QPixmap pixmap, QString name = QString(), Alignment alignment = Middle);
         virtual ~ImagePoint();
     };
 }

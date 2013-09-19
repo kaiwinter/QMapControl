@@ -26,44 +26,60 @@
 #include "mapadapter.h"
 namespace qmapcontrol
 {
-    MapAdapter::MapAdapter(const QString& host, const QString& serverPath, int tilesize, int minZoom, int maxZoom)
-            :myhost(host), serverPath(serverPath), mytilesize(tilesize), min_zoom(minZoom), max_zoom(maxZoom)
+    MapAdapter::MapAdapter(const QString& qHost, const QString& qServerPath, int qTilesize, int qMinZoom, int qMaxZoom)
+            :mTileSize(qTilesize), mMin_zoom(qMinZoom), mMax_zoom(qMaxZoom)
     {
-        current_zoom = min_zoom;
-        loc = QLocale(QLocale::English);
+        mCurrent_zoom = qMinZoom;
+        changeHostAddress( qHost, qServerPath );
     }
 
     MapAdapter::~MapAdapter()
     {
     }
 
+    void MapAdapter::changeHostAddress( const QString qHost, const QString qServerPath )
+    {
+        mServerHost = qHost;
+        mServerPath = qServerPath;
+    }
+
     QString MapAdapter::host() const
     {
-        return myhost;
+        return mServerHost;
+    }
+    
+    QString MapAdapter::serverPath() const
+    {
+        return mServerPath;
     }
 
     int MapAdapter::tilesize() const
     {
-        return mytilesize;
+        return mTileSize;
     }
 
     int MapAdapter::minZoom() const
     {
-        return min_zoom;
+        return mMin_zoom;
     }
 
     int MapAdapter::maxZoom() const
     {
-        return max_zoom;
+        return mMax_zoom;
     }
 
     int MapAdapter::currentZoom() const
     {
-        return current_zoom;
+        return mCurrent_zoom;
     }
 
     int MapAdapter::adaptedZoom() const
     {
-        return max_zoom < min_zoom ? min_zoom - current_zoom : current_zoom;
+        return mMax_zoom < mMin_zoom ? mMin_zoom - mCurrent_zoom : mCurrent_zoom;
+    }
+
+    void MapAdapter::setBoundingBox(qreal qMinX, qreal qMinY, qreal qMaxX, qreal qMaxY )
+    {
+        mBoundingBox = QRectF( QPointF( qMinX, qMinY ), QPointF(qMaxX, qMaxY ) ); 
     }
 }

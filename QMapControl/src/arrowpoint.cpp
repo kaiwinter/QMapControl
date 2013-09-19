@@ -33,7 +33,7 @@ namespace qmapcontrol
         size = QSize(sideLength, sideLength);
         h = heading;
         mypen = pen;
-        mypixmap = new QPixmap(sideLength, sideLength);
+        mypixmap = QPixmap(sideLength, sideLength);
         drawArrow();
     }
 
@@ -60,9 +60,9 @@ namespace qmapcontrol
 
     void ArrowPoint::drawArrow()
     {
-        mypixmap = new QPixmap(size);
-        mypixmap->fill(Qt::transparent);
-        QPainter painter(mypixmap);
+        mypixmap = QPixmap(size);
+        mypixmap.fill(Qt::transparent);
+        QPainter painter(&mypixmap);
 //#if !defined Q_WS_MAEMO_5  //FIXME Maemo has a bug - it will antialias our point out of existence
         painter.setRenderHints(QPainter::Antialiasing|QPainter::HighQualityAntialiasing);
 //#endif

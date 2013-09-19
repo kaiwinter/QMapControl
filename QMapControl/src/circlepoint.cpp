@@ -31,7 +31,7 @@ namespace qmapcontrol
     {
         size = QSize(radius, radius);
         mypen = pen;
-        mypixmap = new QPixmap(radius+1, radius+1);
+        mypixmap = QPixmap(radius+1, radius+1);
         drawCircle();
     }
 
@@ -41,7 +41,7 @@ namespace qmapcontrol
         int radius = 10;
         size = QSize(radius, radius);
         mypen = pen;
-        mypixmap = new QPixmap(radius+1, radius+1);
+        mypixmap = QPixmap(radius+1, radius+1);
         drawCircle();
     }
 
@@ -57,8 +57,8 @@ namespace qmapcontrol
 
     void CirclePoint::drawCircle()
     {
-        mypixmap->fill(Qt::transparent);
-        QPainter painter(mypixmap);
+        mypixmap.fill(Qt::transparent);
+        QPainter painter(&mypixmap);
 //#if !defined Q_WS_MAEMO_5 //FIXME Maemo has a bug - it will antialias our point out of existence
         painter.setRenderHints(QPainter::Antialiasing|QPainter::HighQualityAntialiasing);
 //#endif

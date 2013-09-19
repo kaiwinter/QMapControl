@@ -96,7 +96,7 @@ namespace qmapcontrol
          * to do coordinate transformations.
          * @return the MapAdapter which us used by this Layer
          */
-        const MapAdapter* mapadapter() const;
+        MapAdapter* mapadapter();
 
         //! adds a Geometry object to this Layer
         /*!
@@ -110,10 +110,15 @@ namespace qmapcontrol
          * This method removes a Geometry object from this Layer.
          */
         void removeGeometry(Geometry* geometry);
-
+        
         //! removes all Geometry objects from this Layer
         /*!
          * This method removes all Geometry objects from this Layer.
+         */
+        bool containsGeometry( Geometry* geometry );
+        //! returns true if Layer contains geometry
+        /*!
+         * This method returns if a Geometry objects is on this Layer.
          */
         void clearGeometries();
 
@@ -131,9 +136,6 @@ namespace qmapcontrol
         Layer::LayerType layertype() const;
 
         void setMapAdapter(MapAdapter* mapadapter);
-
-        //Layer& operator=(const Layer& rhs);
-        //Layer(const Layer& old);
 
     private:
         void moveWidgets(const QPoint mapmiddle_px) const;

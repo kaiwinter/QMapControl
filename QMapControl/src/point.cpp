@@ -33,7 +33,7 @@ namespace qmapcontrol
     {
         visible = point.isVisible();
         mywidget = 0;
-        mypixmap = 0;
+        mypixmap = QPixmap();
         mypen = point.mypen;
         homelevel = -1;
         minsize = QSize(-1,-1);
@@ -45,7 +45,7 @@ namespace qmapcontrol
     {
         GeometryType = "Point";
         mywidget = 0;
-        mypixmap = 0;
+        mypixmap = QPixmap();
         visible = true;
         homelevel = -1;
         minsize = QSize(-1,-1);
@@ -65,13 +65,13 @@ namespace qmapcontrol
         maxsize = QSize(-1,-1);
         mywidget->show();
     }
-    Point::Point(qreal x, qreal y, QPixmap* pixmap, QString name, enum Alignment alignment)
+    Point::Point(qreal x, qreal y, QPixmap pixmap, QString name, enum Alignment alignment)
             : Geometry(name), X(x), Y(y), mypixmap(pixmap), myalignment(alignment)
     {
         GeometryType = "Point";
         mywidget = 0;
         visible = true;
-        size = pixmap->size();
+        size = pixmap.size();
         homelevel = -1;
         minsize = QSize(-1,-1);
         maxsize = QSize(-1,-1);
@@ -99,7 +99,17 @@ namespace qmapcontrol
     Point::~Point()
     {
         delete mywidget;
-        delete mypixmap;
+        mywidget = 0;
+    }
+
+    void Point::setPixmap( QPixmap qPixmap )
+    {
+        mypixmap = qPixmap;
+        size = mypixmap.size();
+
+        //forces redraw
+        emit(updateRequest(QRectF(X, Y, size.width(), size.height())));
+        emit(positionChanged(this));
     }
 
     void Point::setVisible(bool visible)
@@ -158,7 +168,6 @@ namespace qmapcontrol
             else if (maxsize.width() != -1 && viewwidth > maxsize.width())
                 viewwidth = maxsize.width();
 
-
             displaysize = QSize(viewwidth, viewheight);
         }
         else
@@ -167,7 +176,7 @@ namespace qmapcontrol
         }
 
 
-        if (mypixmap !=0)
+        if (mypixmap.size().width() > 0)
         {
             const QPointF c = QPointF(X, Y);
             QPoint point = mapadapter->coordinateToDisplay(c);
@@ -175,7 +184,7 @@ namespace qmapcontrol
             if (viewport.contains(point))
             {
                 QPoint alignedtopleft = alignedPoint(point);
-                painter->drawPixmap(alignedtopleft.x(), alignedtopleft.y(), displaysize.width(), displaysize.height(), *mypixmap);
+                painter->drawPixmap(alignedtopleft.x(), alignedtopleft.y(), displaysize.width(), displaysize.height(), mypixmap);
             }
 
         }
@@ -224,15 +233,22 @@ namespace qmapcontrol
             alignedtopleft.setX(point.x()-displaysize.width());
             alignedtopleft.setY(point.y()-displaysize.height());
         }
+        else if (myalignment == BottomMiddle)
+        {
+            alignedtopleft.setX(point.x()-displaysize.width()/2);
+            alignedtopleft.setY(point.y()-displaysize.height());
+        }
+        else if (myalignment == TopMiddle)
+        {
+            alignedtopleft.setX(point.x()-displaysize.width()/2);
+            alignedtopleft.setY(point.y());
+        }
         return alignedtopleft;
     }
-
 
     bool Point::Touches(Point* p, const MapAdapter* mapadapter)
     {
         if (this->isVisible() == false)
-            return false;
-        if (mypixmap == 0)
             return false;
 
         QPointF c = p->coordinate();
@@ -244,26 +260,50 @@ namespace qmapcontrol
 
         switch (myalignment)
         {
-                        case Middle:
-            p1 = pxOfPoint - QPoint(displaysize.width()/2,displaysize.height()/2);
-            p2 = pxOfPoint + QPoint(displaysize.width()/2,displaysize.height()/2);
-            break;
-                        case TopLeft:
-            p1 = pxOfPoint - QPoint(displaysize.width(),displaysize.height());
-            p2 = pxOfPoint;
-            break;
-                        case TopRight:
-            p1 = pxOfPoint - QPoint(0, displaysize.height());
-            p2 = pxOfPoint + QPoint(displaysize.width(),0);
-            break;
-                        case BottomLeft:
-            p1 = pxOfPoint - QPoint(displaysize.width(), 0);
-            p2 = pxOfPoint + QPoint(0, displaysize.height());
-            break;
-                        case BottomRight:
-            p1 = pxOfPoint;
-            p2 = pxOfPoint + QPoint(displaysize.width(), displaysize.height());
-            break;
+            case Middle:
+            {
+                p1 = pxOfPoint - QPoint(displaysize.width()/2,displaysize.height()/2);
+                p2 = pxOfPoint + QPoint(displaysize.width()/2,displaysize.height()/2);
+                break;
+            }
+            case TopLeft:
+            {
+                p1 = pxOfPoint - QPoint(displaysize.width(),displaysize.height());
+                p2 = pxOfPoint;
+                break;
+            }
+            case TopRight:
+            {
+                p1 = pxOfPoint - QPoint(0, displaysize.height());
+                p2 = pxOfPoint + QPoint(displaysize.width(),0);
+                break;
+            }
+            case BottomLeft:
+            {
+                p1 = pxOfPoint - QPoint(displaysize.width(), 0);
+                p2 = pxOfPoint + QPoint(0, displaysize.height());
+                break;
+            }
+            case BottomRight:
+            {
+                p1 = pxOfPoint;
+                p2 = pxOfPoint + QPoint(displaysize.width(), displaysize.height());
+                break;
+            }
+            case TopMiddle:
+            {
+                p1 = pxOfPoint - QPoint(displaysize.width(),displaysize.height());
+                p2 = pxOfPoint + QPoint(displaysize.width()/2,displaysize.height()/2);
+                break;
+            }
+            case BottomMiddle:
+            {
+                p1 = pxOfPoint - QPoint(displaysize.width()/2,displaysize.height()/2);
+                p2 = pxOfPoint + QPoint(displaysize.width(), displaysize.height());
+                break;
+            }
+            default:
+                break;
         }
 
         // calculate "Bounding Box" in coordinates
@@ -284,13 +324,17 @@ namespace qmapcontrol
 
     void Point::setCoordinate(QPointF point)
     {
-        // emit(updateRequest(this));
-        // emit(updateRequest(QRectF(X, Y, size.width(), size.height())));
+        if ( X == point.x() &&
+             Y == point.y() )        
+        {
+            //no change, prevent unessessary update/redraw
+            return;
+        }
+
         X = point.x();
         Y = point.y();
-        // emit(updateRequest(this));
+        
         emit(updateRequest(QRectF(X, Y, size.width(), size.height())));
-
         emit(positionChanged(this));
     }
     QList<Point*> Point::points()
@@ -306,7 +350,7 @@ namespace qmapcontrol
         return mywidget;
     }
 
-    QPixmap* Point::pixmap()
+    QPixmap Point::pixmap()
     {
         return mypixmap;
     }

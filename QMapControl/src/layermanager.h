@@ -30,6 +30,7 @@
 #include <QObject>
 #include <QMap>
 #include <QListIterator>
+#include <QRectF>
 #include "layer.h"
 #include "mapadapter.h"
 #include "mapcontrol.h"
@@ -161,6 +162,13 @@ namespace qmapcontrol
          */
         void addLayer(Layer* layer);
 
+        //! removes a layer
+        /*!
+         * Removes a layer and redraws existing layers
+         * @param layer the layer which should be removed
+         */
+        void removeLayer( Layer* layer );
+
         //! returns the current zoom level
         /*!
          * @return returns the current zoom level
@@ -169,6 +177,35 @@ namespace qmapcontrol
 
         void drawGeoms(QPainter* painter);
         void drawImage(QPainter* painter);
+
+
+        //! Set whether to enable a view bounding box
+        /*!
+         *
+         * @param usebounds enable/disable use of bounding box
+         */
+        void setUseBoundingBox( bool usebounds );
+
+        //! Check if bounding box is being used
+        /*!
+         *
+         * @return if bounding box is being used
+         */
+        bool isBoundingBoxEnabled();
+
+        //! Set constraints for bounding box
+        /*!
+         *
+         * @param rect specified bounds for view to stay within
+         */
+        void setBoundingBox( QRectF &rect );
+
+        //! Get current bounding box
+        /*!
+         *
+         * @return bounding box
+         */
+        QRectF getBoundingBox();
 
     private:
         LayerManager& operator=(const LayerManager& rhs);
@@ -202,6 +239,9 @@ namespace qmapcontrol
         QPointF mapmiddle; // world coordinate
 
         QPoint whilenewscroll;
+
+        QRectF boundingBox; // limit viewing area if desired
+        bool useBoundingBox;
 
     public slots:
         void updateRequest(QRectF rect);
