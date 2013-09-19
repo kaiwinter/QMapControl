@@ -62,7 +62,7 @@ namespace qmapcontrol
             if (doPersistentCaching && tileExist(url))
             {
                 loadTile(url,pm);
-                QPixmapCache::insert(url.toAscii().toBase64(), pm);
+                QPixmapCache::insert(url, pm);
             }
             else
             {
