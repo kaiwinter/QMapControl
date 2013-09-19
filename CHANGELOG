@@ -1,3 +1,28 @@
+2013-09-19
+- FIXED: threading issues and only allow one thread to check the load queue at a time
+- ADDED: Unified Google map adapter, supports vector maps (default), satellite, terrain, hybrid & raster
+- REMOVED: removed googlesatmapadapter (replaced with unified class)
+- FIXED: WMSMapAdapter, auto-fill required parameters unless overridden
+- FIXED: Fixed various potentials for crashes throughout
+- FIXED: Fixed potentials for memory leaks caused by unnecessary pointers
+- FIXED: Cleaned up various member variable names
+- FIXED: Corrected bug where cached images were stored but never used
+- NEW: Added Ability to Dynamically set Proxy Settings without needing to re-initialize QMapControl
+- NEW: Added ability to Dynamically set off-line/cache directory without needing to re-initialize QMapControl
+- NEW: Added Setting to specify the age of a cached image, if expired, replaces with a newer copy from server
+- FIXED: Correct bug where resizing a layer wouldnt redraw
+- NEW: function to see query a layer to see if it contains a geometry
+- FIXED: Prevent adding duplicate geometry to layer, leaving byhind artifacts when removing
+- REMOVED: QAsserts, replaced with logging
+- FIXED: fixed infinite zoom loop in LayerManager::setViewAndZoomIn()
+- NEW: Support adding and removing layers cleanly
+- NEW: Added a configuration item to limit view port to a bounding box, that is, prevent scrolling/zooming outside a specified region
+- NEW: Ability to dynamically change host address of a MapAdapter (i.e. for use with mirror/backup servers)
+- NEW: Ability to disable mouse wheel scroll zooming
+- FIXED: fixed issue preventing drawing when zooming in or out in some scenarios
+- FIXED: support for port numbers, other than port 80
+- NEW: Dynamically change the pixmap image of a point already on a map
+
 2010-09-15
 - Whole project is now a dynamic linked library
 - The project structure was updated caused by the dll approach
