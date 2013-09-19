@@ -68,7 +68,7 @@ namespace qmapcontrol
         * @param pixmap pointer to the image pixmap
         * @param name the name of the image point
         */
-        FixedImageOverlay(qreal x_upperleft, qreal y_upperleft, qreal x_lowerright, qreal y_lowerright, QPixmap* pixmap, QString name = QString());
+        FixedImageOverlay(qreal x_upperleft, qreal y_upperleft, qreal x_lowerright, qreal y_lowerright, QPixmap pixmap, QString name = QString());
 
         virtual void draw(QPainter* painter, const MapAdapter* mapadapter, const QRect &viewport, const QPoint offset);
         virtual ~FixedImageOverlay();

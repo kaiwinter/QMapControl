@@ -31,6 +31,7 @@
 #include <QSize>
 #include <QPoint>
 #include <QPointF>
+#include <QRectF>
 #include <QLocale>
 #include <QDebug>
 #include <cmath>
@@ -50,7 +51,7 @@ namespace qmapcontrol
      *
      * @see TileMapAdapter, @see WMSMapAdapter
      *
-     *	@author Kai Winter <kaiwinter@gmx.de>
+     *  @author Kai Winter <kaiwinter@gmx.de>
      */
     class QMAPCONTROL_EXPORT MapAdapter : public QObject
     {
@@ -66,6 +67,19 @@ namespace qmapcontrol
          * @return  the host of this MapAdapter
          */
         QString host() const;
+        
+        //! returns the server path part of this MapAdapter
+        /*!
+         * @return  the serverpath of this MapAdapter
+         */
+        virtual QString serverPath() const;
+
+        //! change or update server host address post init
+        /*!
+         * @param host the host address
+         * @param serverPath the server path
+         */
+        virtual void changeHostAddress( const QString qHost, const QString qServerPath = QString() );
 
         //! returns the size of the tiles
         /*!
@@ -92,7 +106,7 @@ namespace qmapcontrol
         int currentZoom() const;
 
         virtual int adaptedZoom()const;
-
+        
         //! translates a world coordinate to display coordinate
         /*!
          * The calculations also needs the current zoom. The current zoom is managed by the MapAdapter, so this is no problem.
@@ -109,22 +123,26 @@ namespace qmapcontrol
          * @param  point the display coordinate
          * @return the world coordinate
          */
-        virtual QPointF	displayToCoordinate(const QPoint& point) const = 0;
+        virtual QPointF displayToCoordinate(const QPoint& point) const = 0;
+
+        QRectF getBoundingbox() const { return mBoundingBox; }
+        void setBoundingBox(qreal qMinX, qreal qMinY, qreal qMaxX, qreal qMaxY );
 
     protected:
-        MapAdapter(const QString& host, const QString& serverPath, int tilesize, int minZoom = 0, int maxZoom = 0);
+        MapAdapter(const QString& qHost, const QString& qServerPath, int qTilesize, int qMinZoom = 0, int qMaxZoom = 0);
         virtual void zoom_in() = 0;
         virtual void zoom_out() = 0;
         virtual bool isValid(int x, int y, int z) const = 0;
         virtual QString query(int x, int y, int z) const = 0;
 
-        QSize 	size;
-        QString	myhost;
-        QString	serverPath;
-        int mytilesize;
-        int min_zoom;
-        int max_zoom;
-        int current_zoom;
+        QSize       mSize;
+        QString     mServerHost;
+        QString     mServerPath;
+
+        int         mTileSize;
+        int         mMin_zoom;
+        int         mMax_zoom;
+        int         mCurrent_zoom;
 
         int param1;
         int param2;
@@ -142,11 +160,12 @@ namespace qmapcontrol
 
         int order[3][2];
 
-        int middle_x;
-        int middle_y;
+        int mMiddle_x;
+        int mMiddle_y;
 
-        qreal numberOfTiles;
+        qreal mNumberOfTiles;
         QLocale loc;
+        QRectF mBoundingBox;
     };
 }
 #endif

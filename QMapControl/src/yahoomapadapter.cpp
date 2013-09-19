@@ -29,14 +29,14 @@ namespace qmapcontrol
     YahooMapAdapter::YahooMapAdapter()
             : TileMapAdapter("png.maps.yimg.com", "/png?v=3.1.0&x=%2&y=%3&z=%1", 256, 17,0)
     {
-        int zoom = max_zoom < min_zoom ? min_zoom - current_zoom : current_zoom;
-        numberOfTiles = pow(2.0, zoom+1);
+        int zoom = mMax_zoom < mMin_zoom ? mMin_zoom - mCurrent_zoom : mCurrent_zoom;
+        mNumberOfTiles = pow(2.0, zoom+1);
     }
     YahooMapAdapter::YahooMapAdapter(QString host, QString url)
             : TileMapAdapter(host, url, 256, 17,0)
     {
-        int zoom = max_zoom < min_zoom ? min_zoom - current_zoom : current_zoom;
-        numberOfTiles = pow(2.0, zoom+1);
+        int zoom = mMax_zoom < mMin_zoom ? mMin_zoom - mCurrent_zoom : mCurrent_zoom;
+        mNumberOfTiles = pow(2.0, zoom+1);
     }
     YahooMapAdapter::~YahooMapAdapter()
     {
@@ -54,7 +54,7 @@ namespace qmapcontrol
 
     int YahooMapAdapter::yoffset(int y) const
     {
-        int zoom = max_zoom < min_zoom ? min_zoom - current_zoom : current_zoom;
+        int zoom = mMax_zoom < mMin_zoom ? mMin_zoom - mCurrent_zoom : mCurrent_zoom;
 
         int tiles = int(pow(2.0, zoom));
         y = y*(-1)+tiles-1;

@@ -39,6 +39,7 @@
 #include <QPushButton>
 #include <QLineEdit>
 #include <QGridLayout>
+#include <QMutex>
 #include "imagemanager.h"
 
 /**
@@ -71,18 +72,13 @@ namespace qmapcontrol
         void abortLoading();
         void setProxy(QString host, int port);
 
-        /*!
-         *
-         * @return number of elements in the load queue
-         */
-        int loadQueueSize() const;
-
     private:
         ImageManager* parent;
         QHttp* http;
         QMap<int, QString> loadingMap;
         qreal loaded;
         mutable QMutex vectorMutex;
+        bool    networkActive;
         MapNetwork& operator=(const MapNetwork& rhs);
         MapNetwork(const MapNetwork& old);
 

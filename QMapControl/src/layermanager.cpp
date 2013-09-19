@@ -36,6 +36,7 @@ namespace qmapcontrol
         zoomImage = QPixmap(size);
         zoomImage.fill(Qt::white);
         screenmiddle = QPoint(size.width()/2, size.height()/2);
+        useBoundingBox = false;
     }
 
 
@@ -56,8 +57,12 @@ namespace qmapcontrol
 
     Layer* LayerManager::layer() const
     {
-        Q_ASSERT_X(mylayers.size()>0, "LayerManager::getLayer()", "No layers were added!");
-        return mylayers.first();
+        if ( mylayers.isEmpty() )
+        {
+            qDebug() << "LayerManager::getLayer() - No layers were added";
+            return 0;
+        }
+        return mylayers.at(0) ? mylayers.at(0) : 0;
     }
 
     Layer* LayerManager::layer(const QString& layername) const
@@ -86,18 +91,24 @@ namespace qmapcontrol
 
     void LayerManager::scrollView(const QPoint& point)
     {
-        scroll += point;
-        zoomImageScroll+=point;
-        mapmiddle_px += point;
+        QPointF tempMiddle = layer()->mapadapter()->displayToCoordinate(mapmiddle_px + point);
 
-        mapmiddle = layer()->mapadapter()->displayToCoordinate(mapmiddle_px);
-        if (!checkOffscreen())
+        if((useBoundingBox && boundingBox.contains(tempMiddle)) || !useBoundingBox)
         {
-            newOffscreenImage();
-        }
-        else
-        {
-            moveWidgets();
+            scroll += point;
+            zoomImageScroll += point;
+            mapmiddle_px += point;
+
+            mapmiddle = tempMiddle;
+
+            if (!checkOffscreen())
+            {
+                newOffscreenImage();
+            }
+            else
+            {
+                moveWidgets();
+            }
         }
     }
 
@@ -112,6 +123,18 @@ namespace qmapcontrol
 
     void LayerManager::setView(const QPointF& coordinate)
     {
+        if ( !layer() )
+        {
+            qDebug() << "LayerManager::setView() - cannot set view settings with no layers configured";
+            return;
+        }
+
+        if ( !layer()->mapadapter() )
+        {
+            qDebug() << "LayerManager::setView() - cannot set view settings with no map adapter configured";
+            return;
+        }
+
         mapmiddle_px = layer()->mapadapter()->coordinateToDisplay(coordinate);
         mapmiddle = coordinate;
 
@@ -132,20 +155,43 @@ namespace qmapcontrol
     void LayerManager::setView(QList<QPointF> coordinates)
     {
         setMiddle(coordinates);
-        // mapcontrol->update();
+        mapcontrol->update();
     }
 
     void LayerManager::setViewAndZoomIn(const QList<QPointF> coordinates)
     {
+        if ( !layer() )
+        {
+            qDebug() << "LayerManager::setViewAndZoomIn() - no layers configured";
+            return;
+        }
+
+
+        while (!containsAll(coordinates))
+        {
+            setMiddle(coordinates);
+            zoomOut();
+            // bugfix Tl
+            // if points are too close -> Loop of death...
+            if ( layer()->mapadapter()->currentZoom() == 0 )
+            {
+                qDebug() << "LayerManager::setViewAndZoomIn() - reached minium zoom level";
+                break;
+            }
+        }
+
         while (containsAll(coordinates))
         {
             setMiddle(coordinates);
             zoomIn();
             // bugfix Tl
             // if points are too close -> Loop of death...
-            if (17 == layer()->mapadapter()->currentZoom()) break;
+            if ( layer()->mapadapter()->currentZoom() == 17 )
+            {
+                qDebug() << "LayerManager::setViewAndZoomIn() - reached maximum zoom level";
+                break;
+            }
         }
-
 
         if (!containsAll(coordinates))
         {
@@ -157,6 +203,12 @@ namespace qmapcontrol
 
     void LayerManager::setMiddle(QList<QPointF> coordinates)
     {
+        if ( !layer() )
+        {
+            qDebug() << "LayerManager::setMiddle() - no layers configured";
+            return;
+        }
+        
         int sum_x = 0;
         int sum_y = 0;
         for (int i=0; i<coordinates.size(); i++)
@@ -190,6 +242,12 @@ namespace qmapcontrol
 
     QRectF LayerManager::getViewport() const
     {
+        if ( !layer() )
+        {
+            qDebug() << "LayerManager::getViewport() - no layers configured";
+            return QRectF();
+        }
+
         QPoint upperLeft = QPoint(mapmiddle_px.x()-screenmiddle.x(), mapmiddle_px.y()+screenmiddle.y());
         QPoint lowerRight = QPoint(mapmiddle_px.x()+screenmiddle.x(), mapmiddle_px.y()-screenmiddle.y());
 
@@ -206,15 +264,34 @@ namespace qmapcontrol
 
         layer->setSize(size);
 
+        //sanity check first
+        disconnect( layer, 0, this, 0 );
+
         connect(layer, SIGNAL(updateRequest(QRectF)),
                 this, SLOT(updateRequest(QRectF)));
         connect(layer, SIGNAL(updateRequest()),
                 this, SLOT(updateRequest()));
 
-        if (mylayers.size()==1)
+        if (mylayers.size() > 0)
         {
-            setView(QPointF(0,0));
+            //setView(QPointF(0,0));
         }
+        mapcontrol->update();
+    }
+
+    void LayerManager::removeLayer(Layer* layer)
+    {
+        if ( layer )
+        {
+            disconnect( layer, 0, this, 0 );
+            mylayers.removeAll(layer);
+        }
+
+        if (mylayers.size() > 0)
+        {
+            //setView(QPointF(0,0));
+        }
+        mapcontrol->update();
     }
 
     void LayerManager::newOffscreenImage(bool clearImage, bool showZoomImage)
@@ -253,9 +330,15 @@ namespace qmapcontrol
 
     void LayerManager::zoomIn()
     {
-        QCoreApplication::processEvents();
+        if ( !layer() )
+        {
+            qDebug() << "LayerManager::zoomIn() - no layers configured";
+            return;
+        }
 
         ImageManager::instance()->abortLoading();
+        //QCoreApplication::processEvents();
+
         // layer rendern abbrechen?
         zoomImageScroll = QPoint(0,0);
 
@@ -285,11 +368,16 @@ namespace qmapcontrol
         whilenewscroll = mapmiddle_px;
 
         newOffscreenImage();
-
     }
 
     bool LayerManager::checkOffscreen() const
     {
+        if ( !layer() )
+        {
+            qDebug() << "LayerManager::checkOffscreen() - no layers configured";
+            return true;
+        }
+
         // calculate offscreenImage dimension (px)
         QPoint upperLeft = mapmiddle_px - screenmiddle;
         QPoint lowerRight = mapmiddle_px + screenmiddle;
@@ -306,7 +394,13 @@ namespace qmapcontrol
     }
     void LayerManager::zoomOut()
     {
-        QCoreApplication::processEvents();
+        if ( !layer() )
+        {
+            qDebug() << "LayerManager::zoomOut() - no layers configured";
+            return;
+        }
+
+        //QCoreApplication::processEvents();
         ImageManager::instance()->abortLoading();
         zoomImageScroll = QPoint(0,0);
         zoomImage.fill(Qt::white);
@@ -340,6 +434,12 @@ namespace qmapcontrol
 
     void LayerManager::setZoom(int zoomlevel)
     {
+        if ( !layer() )
+        {
+            qDebug() << "LayerManager::setZoom() - no layers configured";
+            return;
+        }
+
         int current_zoom;
         if (layer()->mapadapter()->minZoom() < layer()->mapadapter()->maxZoom())
         {
@@ -369,11 +469,14 @@ namespace qmapcontrol
 
     void LayerManager::mouseEvent(const QMouseEvent* evnt)
     {
-        QListIterator<Layer*> it(mylayers);
-        while (it.hasNext())
+        if ( mapcontrol && !mapcontrol->mouseWheelEventsEnabled() )
         {
-            Layer* l = it.next();
-            if (l->isVisible())
+            return;
+        }
+        
+        foreach( Layer* l, mylayers )
+        {
+            if (l && l->isVisible() )
             {
                 l->mouseEvent(evnt, mapmiddle_px);
             }
@@ -395,7 +498,7 @@ namespace qmapcontrol
             //
             // mapcontrol->updateRequest(rect_px);
             mapcontrol->update();
-            // newOffscreenImage();
+            //newOffscreenImage();
         }
     }
     void LayerManager::updateRequest()
@@ -414,6 +517,11 @@ namespace qmapcontrol
 
     void LayerManager::drawGeoms(QPainter* painter)
     {
+        if ( !layer() )
+        {
+            qDebug() << "LayerManager::drawGeoms() - no layers configured";
+            return;
+        }
         QListIterator<Layer*> it(mylayers);
         while (it.hasNext())
         {
@@ -433,6 +541,11 @@ namespace qmapcontrol
 
     int LayerManager::currentZoom() const
     {
+        if ( !layer() )
+        {
+            qDebug() << "LayerManager::currentZoom() - no layers configured";
+            return 0;
+        }
         return layer()->mapadapter()->currentZoom();
     }
 
@@ -455,5 +568,32 @@ namespace qmapcontrol
         }
 
         newOffscreenImage();
+        forceRedraw();
+    }
+
+    void LayerManager::setUseBoundingBox( bool usebounds )
+    {
+        useBoundingBox = usebounds;
+    }
+
+    bool LayerManager::isBoundingBoxEnabled()
+    {
+        return useBoundingBox;
+    }
+    
+    void LayerManager::setBoundingBox( QRectF &rect )
+    {
+        if( rect.right() < rect.left() )
+            qDebug() << "LayerManager::setBoundingBox() - min longitude is bigger than max";
+
+        if( rect.top() < rect.bottom() )
+            qDebug() << "LayerManager::setBoundingBox() - min latitude is bigger than max";
+
+        boundingBox = rect;
+    }
+
+    QRectF LayerManager::getBoundingBox()
+    {
+        return boundingBox;
     }
 }

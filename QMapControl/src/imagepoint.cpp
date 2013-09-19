@@ -30,16 +30,16 @@ namespace qmapcontrol
             : Point(x, y, name, alignment)
     {
         //qDebug() << "loading image: " << filename;
-        mypixmap = new QPixmap(filename);
-        size = mypixmap->size();
+        mypixmap = QPixmap(filename);
+        size = mypixmap.size();
         //qDebug() << "image size: " << size;
     }
 
-    ImagePoint::ImagePoint(qreal x, qreal y, QPixmap* pixmap, QString name, Alignment alignment)
+    ImagePoint::ImagePoint(qreal x, qreal y, QPixmap pixmap, QString name, Alignment alignment)
             : Point(x, y, name, alignment)
     {
         mypixmap = pixmap;
-        size = mypixmap->size();
+        size = mypixmap.size();
     }
 
 
