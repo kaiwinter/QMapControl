@@ -25,6 +25,9 @@
 
 #include "mapnetwork.h"
 #include <QWaitCondition>
+
+#include <QMutexLocker>
+
 namespace qmapcontrol
 {
     MapNetwork::MapNetwork(ImageManager* parent)
@@ -56,11 +59,8 @@ namespace qmapcontrol
         header.setValue("Host", host);
         int getId = http->request(header);
 
-        if (vectorMutex.tryLock())
-        {
-            loadingMap[getId] = url;
-            vectorMutex.unlock();
-        }
+        QMutexLocker lock(&vectorMutex);
+        loadingMap[getId] = url;
     }
 
     void MapNetwork::requestFinished(int id, bool error)
@@ -73,15 +73,22 @@ namespace qmapcontrol
             //restart query
 
         }
-        else if (vectorMutex.tryLock())
+        else
         {
-            // check if id is in map?
-            if (loadingMap.contains(id))
-            {
 
-                QString url = loadingMap[id];
-                loadingMap.remove(id);
-                vectorMutex.unlock();
+            QString url;
+            {
+                QMutexLocker lock(&vectorMutex);
+                // check if id is in map?
+                if (loadingMap.contains(id))
+                {
+                    url = loadingMap[id];
+                    loadingMap.remove(id);
+                }
+            }
+
+            if(!url.isEmpty())
+            {
                 // qDebug() << "request finished for id: " << id << ", belongs to: " << notifier.url << endl;
                 QByteArray ax;
 
@@ -101,34 +108,43 @@ namespace qmapcontrol
                         qDebug() << "NETWORK_PIXMAP_ERROR: " << ax;
                     }
                 }
-
             }
-            else
-                vectorMutex.unlock();
 
         }
-        if (loadingMap.size() == 0)
+
+        if (loadQueueSize() == 0)
         {
             // qDebug () << "all loaded";
             parent->loadingQueueEmpty();
+    }
+
+    int MapNetwork::loadQueueSize() const
+    {
+        QMutexLocker lock(&vectorMutex);
+        return loadingMap.size();
         }
     }
 
     void MapNetwork::abortLoading()
     {
-    http->clearPendingRequests();
-        if (vectorMutex.tryLock())
-        {
-            loadingMap.clear();
-            vectorMutex.unlock();
-        }
+        http->clearPendingRequests();
+
+        QMutexLocker lock(&vectorMutex);
+        loadingMap.clear();
     }
 
     bool MapNetwork::imageIsLoading(QString url)
     {
+        QMutexLocker lock(&vectorMutex);
         return loadingMap.values().contains(url);
     }
 
+    }
+
+    int MapNetwork::loadQueueSize() const
+    {
+        QMutexLocker lock(&vectorMutex);
+        return loadingMap.size();
     void MapNetwork::setProxy(QString host, int port)
     {
 #ifndef Q_WS_QWS

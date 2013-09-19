@@ -136,6 +136,11 @@ namespace qmapcontrol
         if (!cacheDir.exists())
         {
             cacheDir.mkpath(cacheDir.absolutePath());
+    }
+
+    int ImageManager::loadQueueSize() const
+    {
+        return net->loadQueueSize();
         }
     }
 
@@ -179,5 +184,10 @@ namespace qmapcontrol
             return true;
         else
             return false;
+    }
+
+    int ImageManager::loadQueueSize() const
+    {
+        return net->loadQueueSize();
     }
 }

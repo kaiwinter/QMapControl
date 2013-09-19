@@ -57,10 +57,10 @@ namespace qmapcontrol
         }
 
         ~ImageManager();
-
+        
         //! returns a QPixmap of the asked image
         /*!
-         * If this component doesn´t have the image a network query gets started to load it.
+         * If this component doesn't have the image a network query gets started to load it.
          * @param host the host of the image
          * @param path the path to the image
          * @return the pixmap of the asked image
@@ -89,8 +89,8 @@ namespace qmapcontrol
         /*!
          * This method sets the proxy for HTTP connections.
          * This is not provided by the current Qtopia version!
-         * @param host the proxy´s hostname or ip
-         * @param port the proxy´s port
+         * @param host the proxy's hostname or ip
+         * @param port the proxy's port
          */
         void setProxy(QString host, int port);
 
@@ -101,6 +101,16 @@ namespace qmapcontrol
          * @todo add maximum size
          */
         void setCacheDir(const QDir& path);
+
+        /*!
+         * @return Number of images pending in the load queue
+         */
+        int loadQueueSize() const;
+
+        /*!
+         * @return Number of images pending in the load queue
+         */
+        int loadQueueSize() const;
 
     private:
         ImageManager(QObject* parent = 0);

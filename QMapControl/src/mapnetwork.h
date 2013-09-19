@@ -71,12 +71,18 @@ namespace qmapcontrol
         void abortLoading();
         void setProxy(QString host, int port);
 
+        /*!
+         *
+         * @return number of elements in the load queue
+         */
+        int loadQueueSize() const;
+
     private:
         ImageManager* parent;
         QHttp* http;
         QMap<int, QString> loadingMap;
         qreal loaded;
-        QMutex vectorMutex;
+        mutable QMutex vectorMutex;
         MapNetwork& operator=(const MapNetwork& rhs);
         MapNetwork(const MapNetwork& old);
 
