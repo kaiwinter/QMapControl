@@ -104,6 +104,11 @@ namespace qmapcontrol
          */
         void setCacheDir(int expiry, const QDir& path);
 
+        /*!
+         * @return Number of images pending in the load queue
+         */
+        int loadQueueSize() const;
+
     private:
         ImageManager(QObject* parent = 0);
         ImageManager(const ImageManager&);

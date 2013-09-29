@@ -241,4 +241,9 @@ namespace qmapcontrol
             return false;
         }
     }
+
+    int ImageManager::loadQueueSize() const
+    {
+        return net->loadQueueSize();
+    }
 }
