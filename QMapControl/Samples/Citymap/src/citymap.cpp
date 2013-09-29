@@ -142,15 +142,14 @@ void Citymap::addPubs()
 {
 	pubs = new GeometryLayer("Kneipe", mapadapter);
 	mc->addLayer(pubs);
-	QPixmap* pub = new QPixmap(QCoreApplication::applicationDirPath() + "/images/pub.png");
 	
-	Point* bagatelle = new Point(8.2606, 50.0052, pub, "Bagatelle");
+    Point* bagatelle = new Point(8.2606, 50.0052, QPixmap(QCoreApplication::applicationDirPath() + "/images/pub.png"), "Bagatelle");
 	pubs->addGeometry(bagatelle);
 	
-	Point* nirgendwo = new Point(8.2595, 50.0048, pub, "Nirgendwo");
+    Point* nirgendwo = new Point(8.2595, 50.0048, QPixmap(QCoreApplication::applicationDirPath() + "/images/pub.png"), "Nirgendwo");
 	pubs->addGeometry(nirgendwo);
 	
-	Point* krokodil = new Point(8.2594,50.0106, pub, "Krokodil");
+    Point* krokodil = new Point(8.2594,50.0106, QPixmap(QCoreApplication::applicationDirPath() + "/images/pub.png"), "Krokodil");
 	pubs->addGeometry(krokodil);
 	
 	connect(pubs, SIGNAL(geometryClicked(Geometry*, QPoint)),
@@ -333,7 +332,7 @@ void Citymap::addNote()
 
 void Citymap::writeNote(const QMouseEvent*, const QPointF coord)
 {
-	Point* p = new Point(coord.x(), coord.y(), notepixmap, QString::number(++noteID), Point::BottomLeft);
+    Point* p = new Point(coord.x(), coord.y(), *notepixmap, QString::number(++noteID), Point::BottomLeft);
 	currentnoteID = noteID;
 	p->setBaselevel(16);
 	p->setMinsize(QSize(12, 10));
@@ -419,7 +418,7 @@ void Citymap::calcDistanceClick(const QMouseEvent* evnt, const QPointF coord)
 		pain.setFont(QFont("Helvetiva", 6));
 		pain.drawText(pixm->rect(), QString().setNum(km, 'f', 3) + " km");
 		pain.end();
-		points.append(new Point(coord2.x(), coord2.y(), pixm, "", Point::BottomLeft));
+        points.append(new Point(coord2.x(), coord2.y(), *pixm, "", Point::BottomLeft));
 		l->addGeometry(new LineString(points));
 		mc->updateRequestNew();
 		coord1 = QPointF();

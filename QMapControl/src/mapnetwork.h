@@ -72,6 +72,12 @@ namespace qmapcontrol
         void abortLoading();
         void setProxy(QString host, int port);
 
+        /*!
+        *
+        * @return number of elements in the load queue
+        */
+        int loadQueueSize() const;
+
     private:
         ImageManager* parent;
         QHttp* http;

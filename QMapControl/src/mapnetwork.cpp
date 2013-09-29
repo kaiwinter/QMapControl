@@ -49,7 +49,6 @@ namespace qmapcontrol
         delete http;
     }
 
-
     void MapNetwork::loadImage(const QString& host, const QString& url)
     {
         QString hostName = host;
@@ -109,11 +108,17 @@ namespace qmapcontrol
             }
         }
 
-        if (loadingMap.size() == 0)
+        if (loadQueueSize() == 0)
         {
             // qDebug () << "all loaded";
             parent->loadingQueueEmpty();
         }
+    }
+
+    int MapNetwork::loadQueueSize() const
+    {
+        QMutexLocker lock(&vectorMutex);
+        return loadingMap.size();
     }
 
     void MapNetwork::abortLoading()
