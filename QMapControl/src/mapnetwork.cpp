@@ -85,11 +85,19 @@ namespace qmapcontrol
         if (!error)
         {
             // check if id is in map?
-            if (loadingMap.contains(id))
+          bool idInMap = false;
+          QString url;
+          {
+            QMutexLocker lock(&vectorMutex);
+            idInMap = loadingMap.contains(id);
+            if(idInMap) {
+              url = loadingMap[id];
+              loadingMap.remove(id);
+            }
+          }
+          
+            if (idInMap)
             {
-				QMutexLocker lock(&vectorMutex);
-                QString url = loadingMap[id];
-                loadingMap.remove(id);                
                 // qDebug() << "request finished for id: " << id << ", belongs to: " << notifier.url << endl;
                 QByteArray ax;
 
