@@ -1,3 +1,7 @@
+0.9.6.0 (2013-10-02)
+=====
+- FIXED: Deadlock in MapNetwork::requestFinished() prevent tiles from loading
+
 2013-09-19
 - FIXED: threading issues and only allow one thread to check the load queue at a time
 - ADDED: Unified Google map adapter, supports vector maps (default), satellite, terrain, hybrid & raster
