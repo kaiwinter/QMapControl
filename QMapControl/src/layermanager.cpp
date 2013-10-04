@@ -485,13 +485,10 @@ namespace qmapcontrol
 
     void LayerManager::updateRequest(QRectF rect)
     {
-        const QPoint topleft = mapmiddle_px - screenmiddle;
-
-        QPointF c = rect.topLeft();
-
-        if (getViewport().contains(c) || getViewport().contains(rect.bottomRight()))
+        if (getViewport().contains(rect.topLeft()) || getViewport().contains(rect.bottomRight()))
         {
             // QPoint point = getLayer()->getMapAdapter()->coordinateToDisplay(c);
+            // const QPoint topleft = mapmiddle_px - screenmiddle;
             // QPoint finalpoint = point-topleft;
             // QRect rect_px = QRect(int(finalpoint.x()-(rect.width()-1)/2), int(finalpoint.y()-(rect.height()-1)/2),
             //  int(rect.width()+1), int(rect.height()+1));

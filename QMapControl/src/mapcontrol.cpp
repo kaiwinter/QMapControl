@@ -137,9 +137,6 @@ namespace qmapcontrol
         QPoint dest = layermanager->layer()->mapadapter()->coordinateToDisplay(target);
 
         QPoint step = (dest-start)/steps;
-        QPointF next = currentCoordinate()- step;
-
-        // setView(Coordinate(next.x(), next.y()));
         layermanager->scrollView(step);
 
         update();

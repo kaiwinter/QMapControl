@@ -7,8 +7,8 @@ DESTDIR = ../bin
 TARGET = Citymap
 
 # Input
-SOURCES += citymap.cpp \
-           main.cpp \
- dialogs.cpp
-HEADERS += citymap.h \
- dialogs.h
+SOURCES += src/citymap.cpp \
+           src/main.cpp \
+           src/dialogs.cpp
+HEADERS += src/citymap.h \
+           src/dialogs.h
