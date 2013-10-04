@@ -469,8 +469,7 @@ void Citymap::mapproviderSelected(QAction* action)
 		yahooActionOverlay->setChecked(false);
 	} else if (action == yahooActionSatellite)
 	{
-		int zoom = mapadapter->adaptedZoom();
-		QPointF a = mc->currentCoordinate();
+        int zoom = mapadapter->adaptedZoom();
 		mc->setZoom(0);
 		
 		mapadapter = new YahooMapAdapter("us.maps3.yimg.com", "/aerial.maps.yimg.com/png?v=1.7&t=a&s=256&x=%2&y=%3&z=%1");

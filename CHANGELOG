@@ -1,3 +1,9 @@
+2013-10-04
+=====
+- FIXED: Updated library version to 0.9.6.0
+- FIXED: Removed the GCC Warnings
+- FIXED: CityMap Sample .pro file missing src files
+
 0.9.6.0 (2013-10-02)
 =====
 - FIXED: Deadlock in MapNetwork::requestFinished() prevent tiles from loading
@@ -14,7 +20,7 @@
 - NEW: Added Ability to Dynamically set Proxy Settings without needing to re-initialize QMapControl
 - NEW: Added ability to Dynamically set off-line/cache directory without needing to re-initialize QMapControl
 - NEW: Added Setting to specify the age of a cached image, if expired, replaces with a newer copy from server
-- FIXED: Correct bug where resizing a layer wouldnt redraw
+- FIXED: Correct bug where resizing a layer wouldn't redraw
 - NEW: function to see query a layer to see if it contains a geometry
 - FIXED: Prevent adding duplicate geometry to layer, leaving byhind artifacts when removing
 - REMOVED: QAsserts, replaced with logging
