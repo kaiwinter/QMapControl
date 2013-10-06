@@ -6,6 +6,7 @@
 - FIXED: Removed unnecessary debug output from MapNetwork::requestFinished
 - FIXED: Removed the GCC Warnings
 - FIXED: CityMap Sample .pro file missing src files
+- FIXED: MapControl constructor correctly initialises QWidget for use with QtDesigner
 
 0.9.6.0 (2013-10-02)
 =====
