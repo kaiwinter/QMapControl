@@ -7,6 +7,8 @@
 - FIXED: Removed the GCC Warnings
 - FIXED: CityMap Sample .pro file missing src files
 - FIXED: MapControl constructor correctly initialises QWidget for use with QtDesigner
+- ADDED: easy access to viewport RectF via MapControl::getViewPort()
+- ADDED: helper method to determine if geometry is visible in viewport
 
 0.9.6.0 (2013-10-02)
 =====
