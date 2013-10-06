@@ -67,6 +67,11 @@ namespace qmapcontrol
         emit(updateRequest());
     }
 
+    QList<Geometry*> Layer::getGeometries()
+    {
+        return geometries;
+    }
+
     bool Layer::containsGeometry( Geometry* geometry )
     {
         return geometry && geometries.contains( geometry );
@@ -87,12 +92,14 @@ namespace qmapcontrol
                 this, SIGNAL(updateRequest(QRectF)));
     }
 
-    void Layer::removeGeometry(Geometry* geometry)
+    void Layer::removeGeometry(Geometry* geometry, bool qDeleteObject)
     {
         if ( !geometry )
         {
             return;
         }
+
+        QRectF boundingBox = geometry->boundingBox();
 
         foreach( Geometry* geo, geometries )
         {
@@ -100,16 +107,26 @@ namespace qmapcontrol
             {
                 disconnect(geometry);
                 geometries.removeAll( geometry );
+                if (qDeleteObject)
+                {
+                    delete geo;
+                    geo = 0;
+                }
             }
         }
-        emit(updateRequest(geometry->boundingBox()));
+        emit(updateRequest(boundingBox));
     }
 
-    void Layer::clearGeometries()
+    void Layer::clearGeometries( bool qDeleteObject )
     {
         foreach(Geometry *geometry, geometries)
         {
             disconnect(geometry);
+            if ( qDeleteObject )
+            {
+                delete geometry;
+                geometry = 0;
+            }
         }
         geometries.clear();
     }

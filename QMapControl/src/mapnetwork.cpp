@@ -81,7 +81,7 @@ namespace qmapcontrol
 
     void MapNetwork::requestFinished(int id, bool error)
     {
-        qDebug() << "MapNetwork::requestFinished" << http->state() << ", id: " << id;
+        //qDebug() << "MapNetwork::requestFinished" << http->state() << ", id: " << id;
         if (!error)
         {
             // check if id is in map?

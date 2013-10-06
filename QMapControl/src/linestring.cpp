@@ -42,32 +42,43 @@ namespace qmapcontrol
 
     LineString::~LineString()
     {
+        removePoints();
     }
 
-    // Geometry LineString::Clone(){}
-
-    // Point LineString::EndPoint(){}
-    // Point LineString::StartPoint(){}
-    // Point LineString::Value(){}
-
+    void LineString::removePoints()
+    {
+        QListIterator<Point*> iter(childPoints);
+        while(iter.hasNext())
+        {
+            Point *pt = iter.next();
+            if (pt && pt->parentGeometry() == this)
+            {
+                delete pt;
+                pt = 0;
+            }
+        }
+        childPoints.clear();
+    }
 
     void LineString::addPoint(Point* point)
     {
-        vertices.append(point);
+        childPoints.append(point);
     }
 
     QList<Point*> LineString::points()
     {
-        return vertices;
+        return childPoints;
     }
 
     void LineString::setPoints(QList<Point*> points)
     {
+        removePoints();
+
         for (int i=0; i<points.size(); i++)
         {
             points.at(i)->setParentGeometry(this);
         }
-        vertices = points;
+        childPoints = points;
     }
 
     void LineString::draw(QPainter* painter, const MapAdapter* mapadapter, const QRect &screensize, const QPoint offset)
@@ -78,9 +89,9 @@ namespace qmapcontrol
         QPolygon p = QPolygon();
 
         QPointF c;
-        for (int i=0; i<vertices.size(); i++)
+        for (int i=0; i<childPoints.size(); i++)
         {
-            c = vertices[i]->coordinate();
+            c = childPoints[i]->coordinate();
             p.append(mapadapter->coordinateToDisplay(c));
         }
         if (mypen != 0)
@@ -93,27 +104,28 @@ namespace qmapcontrol
         {
             painter->restore();
         }
-        for (int i=0; i<vertices.size(); i++)
+        for (int i=0; i<childPoints.size(); i++)
         {
-            vertices[i]->draw(painter, mapadapter, screensize, offset);
+            childPoints[i]->draw(painter, mapadapter, screensize, offset);
         }
     }
 
     int LineString::numberOfPoints() const
     {
-        return vertices.count();
+        return childPoints.count();
     }
+
     bool LineString::Touches(Point* geom, const MapAdapter* mapadapter)
     {
         // qDebug() << "LineString::Touches Point";
         touchedPoints.clear();
         bool touches = false;
-        for (int i=0; i<vertices.count(); i++)
+        for (int i=0; i<childPoints.count(); i++)
         {
             // use implementation from Point
-            if (vertices.at(i)->Touches(geom, mapadapter))
+            if (childPoints.at(i)->Touches(geom, mapadapter))
             {
-                touchedPoints.append(vertices.at(i));
+                touchedPoints.append(childPoints.at(i));
 
                 touches = true;
             }
@@ -124,6 +136,7 @@ namespace qmapcontrol
         }
         return touches;
     }
+
     bool LineString::Touches(Geometry* /*geom*/, const MapAdapter* /*mapadapter*/)
     {
         // qDebug() << "LineString::Touches Geom";
@@ -136,10 +149,12 @@ namespace qmapcontrol
     {
         return touchedPoints;
     }
+
     bool LineString::hasPoints() const
     {
-        return vertices.size() > 0 ? true : false;
+        return childPoints.size() > 0 ? true : false;
     }
+
     bool LineString::hasClickedPoints() const
     {
         return touchedPoints.size() > 0 ? true : false;
@@ -151,9 +166,9 @@ namespace qmapcontrol
         qreal maxlon=-180;
         qreal minlat=90;
         qreal maxlat=-90;
-        for (int i=0; i<vertices.size(); i++)
+        for (int i=0; i<childPoints.size(); i++)
         {
-            Point* tmp = vertices.at(i);
+            Point* tmp = childPoints.at(i);
             if (tmp->longitude() < minlon) minlon = tmp->longitude();
             if (tmp->longitude() > maxlon) maxlon = tmp->longitude();
             if (tmp->latitude() < minlat) minlat = tmp->latitude();

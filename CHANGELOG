@@ -1,6 +1,9 @@
-2013-10-04
+0.9.6.1 (2013-10-06)
 =====
-- FIXED: Updated library version to 0.9.6.0
+- ADDED: Cleanup support when calling Layer::removeGeometry() and Layer::clearGeometries()
+- ADDED: Added helper function Layer::getGeometries()
+- ADDED: LineString takes ownership of points and cleans up child Geometries automatically
+- FIXED: Removed unnecessary debug output from MapNetwork::requestFinished
 - FIXED: Removed the GCC Warnings
 - FIXED: CityMap Sample .pro file missing src files
 

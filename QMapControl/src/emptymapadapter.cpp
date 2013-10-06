@@ -30,7 +30,7 @@ namespace qmapcontrol
             :MapAdapter("", "", 256, minZoom, maxZoom)
     {
         Q_UNUSED(tileSize)
-                PI = acos(-1.0);
+        PI = acos(-1.0);
 
         mNumberOfTiles = tilesonzoomlevel(minZoom);
     }
@@ -69,9 +69,9 @@ namespace qmapcontrol
     QString EmptyMapAdapter::query(int x, int y, int z) const
     {
         Q_UNUSED(x)
-                Q_UNUSED(y)
-                Q_UNUSED(z)
-                return "";
+        Q_UNUSED(y)
+        Q_UNUSED(z)
+        return QString();
     }
 
     QPoint EmptyMapAdapter::coordinateToDisplay(const QPointF& coordinate) const
