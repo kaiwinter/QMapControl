@@ -26,8 +26,18 @@
 #include "mapcontrol.h"
 namespace qmapcontrol
 {
-    MapControl::MapControl(QSize size, MouseMode mousemode, bool showScale, bool showCrosshairs)
-            : size(size), mymousemode(mousemode), scaleVisible(showScale), crosshairsVisible(showCrosshairs)
+
+    MapControl::MapControl (QWidget * parent, Qt::WindowFlags windowFlags)
+    {
+        MapControl( QSize(100,100), Panning, false, true, parent, windowFlags);
+    }
+
+    MapControl::MapControl(QSize size, MouseMode mousemode, bool showScale, bool showCrosshairs, QWidget * parent, Qt::WindowFlags windowFlags)
+        :   QWidget( parent, windowFlags ),
+            size(size),
+            mymousemode(mousemode),
+            scaleVisible(showScale),
+            crosshairsVisible(showCrosshairs)
     {
         layermanager = new LayerManager(this, size);
         screen_middle = QPoint(size.width()/2, size.height()/2);

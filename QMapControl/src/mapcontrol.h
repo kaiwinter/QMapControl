@@ -64,6 +64,13 @@ namespace qmapcontrol
             None /*!< Mouse move events have no efect to the map */
         };
 
+        //! The QWidget constructor of MapControl for use with QtDesigner
+        /*!
+         * @param qParent QWidget parent
+         * @param windowFlags QWidget Window flags
+         */
+        MapControl (QWidget * parent = 0, Qt::WindowFlags windowFlags = 0);
+
         //! The constructor of MapControl
         /*!
          * The MapControl is the widget which displays the maps.
@@ -76,8 +83,10 @@ namespace qmapcontrol
          * @param mousemode the way mouse events are handled
          * @param showScale true if the scale should be displayed
          * @param showCrossHairs true if crosshairs should be shown at the centre of the map
+         * @param parent QWidget parent
+         * @param windowFlags QWidget Window flags
          */
-        MapControl ( QSize size, MouseMode mousemode = Panning, bool showScale = false, bool showCrosshairs = true );
+        MapControl ( QSize size, MouseMode mousemode = Panning, bool showScale = false, bool showCrosshairs = true, QWidget * parent = 0, Qt::WindowFlags windowFlags = 0);
 
         ~MapControl();
 
