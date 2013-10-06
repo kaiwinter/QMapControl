@@ -235,6 +235,7 @@ namespace qmapcontrol
         }
         return containsall;
     }
+
     QPoint LayerManager::getMapmiddle_px() const
     {
         return mapmiddle_px;

@@ -507,6 +507,7 @@ namespace qmapcontrol
     {
         mymousemode = mousemode;
     }
+
     MapControl::MouseMode MapControl::mouseMode()
     {
         return mymousemode;
@@ -574,5 +575,22 @@ namespace qmapcontrol
 
         // Return an empty QRectF if there is no layermanager
         return QRectF();
+   }
+
+   QRectF MapControl::getViewport()
+   {
+       if( layermanager )
+           return layermanager->getViewport();
+
+       // Return an empty QRectF if there is no layermanager
+       return QRectF();
+   }
+
+   bool MapControl::isGeometryVisible( Geometry * geometry)
+   {
+       if ( !geometry || getViewport() == QRectF() )
+           return false;
+
+       return getViewport().contains( geometry->boundingBox() );
    }
 }

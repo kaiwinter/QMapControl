@@ -278,6 +278,20 @@ namespace qmapcontrol
          */
         QRectF getBoundingBox();
 
+        //! Get viewport rect
+        /*!
+         *
+         * @return view port rect
+         */
+        QRectF getViewport();
+        //! returns if a geometry is visible on viewport
+        /*!
+         *
+         * @param geometry the Geometry object to check
+         * @return true if geometry is visible
+         */
+        bool isGeometryVisible( Geometry * geometry);
+
     private:
         LayerManager* layermanager;
         QPoint screen_middle; // middle of the widget (half size)
