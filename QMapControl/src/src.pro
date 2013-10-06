@@ -1,7 +1,7 @@
 TARGET = qmapcontrol
 TEMPLATE = lib
 QT += network
-VERSION = 0.9.6.0
+VERSION = 0.9.6.1
 
 DEFINES += QMAPCONTROL_LIBRARY
 

@@ -108,19 +108,31 @@ namespace qmapcontrol
         //! removes the Geometry object from this Layer
         /*!
          * This method removes a Geometry object from this Layer.
+         * NOTE: this method does not delete the object unless qDeleteObject is set
+         * @param qDeleteObject cleans up memory of object after removal
          */
-        void removeGeometry(Geometry* geometry);
+        void removeGeometry(Geometry* geometry, bool qDeleteObject = false);
         
         //! removes all Geometry objects from this Layer
         /*!
          * This method removes all Geometry objects from this Layer.
+         * NOTE: this method does not delete the object unless qDeleteObject is set
+         * @param qDeleteObject cleans up memory of object after removal
          */
-        bool containsGeometry( Geometry* geometry );
+        void clearGeometries( bool qDeleteObject = false);
+
+        //! returns all Geometry objects from this Layer
+        /*!
+         * This method removes all Geometry objects from this Layer.
+         * @return a list of geometries that are on this Layer
+         */
+        QList<Geometry*> getGeometries();
+
         //! returns true if Layer contains geometry
         /*!
          * This method returns if a Geometry objects is on this Layer.
          */
-        void clearGeometries();
+        bool containsGeometry( Geometry* geometry );
 
         //! return true if the layer is visible
         /*!

@@ -66,22 +66,23 @@ namespace qmapcontrol
         void addPoint ( Point* point );
 
         //! sets the given list as points of the LineString
+        //! NOTE: these points will get reparented and cleaned up automatically
         /*!
          * @param points the points which should be set for the LineString
          */
-        void setPoints ( QList<Point*> points );
+        void setPoints ( QList<Point*> points);
 
         //! returns the number of Points the LineString consists of
         /*!
-         * @return the number of the LineStringÂ´s Points
+         * @return the number of the LineString´s Points
          */
         int numberOfPoints() const;
 
-        // virtual Geometry	Clone();
+        //! returns the bounding box (rect) that contains all points
+        /*!
+         * @return the rect that contains all points
+         */
         virtual QRectF boundingBox();
-        // virtual Point EndPoint();
-        // virtual Point StartPoint();
-        // virtual Point Value();
 
         //! returns true if the LineString has Childs
         /*!
@@ -114,7 +115,13 @@ namespace qmapcontrol
         virtual void draw ( QPainter* painter, const MapAdapter* mapadapter, const QRect &screensize, const QPoint offset );
 
     private:
-        QList<Point*>	vertices;
+        //! removes cleans up memory of child points that were reparented with setPoints()
+        /*!
+         * @see setPoints()
+         */
+        void removePoints();
+
+        QList<Point*>	childPoints;
         QList<Geometry*> 	touchedPoints;
     };
 }
