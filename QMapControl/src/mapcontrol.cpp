@@ -51,7 +51,7 @@ namespace qmapcontrol
                 this, SLOT(loadingFinished()));
 
         this->setMaximumSize(size.width()+1, size.height()+1);
-        mouse_wheel_events = false;
+        mouse_wheel_events = true;
     }
 
     MapControl::~MapControl()
@@ -165,11 +165,6 @@ namespace qmapcontrol
     void MapControl::paintEvent(QPaintEvent* evnt)
     {
         QWidget::paintEvent(evnt);
-
-        if (!isVisible())
-        {
-            return;
-        }
 
         QPainter painter(this);
 
@@ -326,15 +321,14 @@ namespace qmapcontrol
         {
             current_mouse_pos = QPoint(evnt->x(), evnt->y());
         }
-        // emit(mouseEventCoordinate(evnt, clickToWorldCoordinate(evnt->pos())));
 
         update();
-        // emit(mouseEventCoordinate(evnt, clickToWorldCoordinate(evnt->pos())));
     }
 
     void MapControl::wheelEvent(QWheelEvent *evnt)
     {
-        if(mouse_wheel_events)
+        if(mouse_wheel_events &&
+            evnt->orientation() == Qt::Vertical)
         {
             if(evnt->delta() > 0)
             {
@@ -343,8 +337,8 @@ namespace qmapcontrol
                     return;
                 }
 
-                this->setView(this->clickToWorldCoordinate(evnt->pos()));
-                this->zoomIn();
+                setView(clickToWorldCoordinate(evnt->pos())); //zoom in under mouse cursor
+                zoomIn();
             }
             else
             {
@@ -352,8 +346,13 @@ namespace qmapcontrol
                 {
                     return;
                 }
-                this->zoomOut();
+                zoomOut();
             }
+            evnt->accept();
+        }
+        else
+        {
+            evnt->ignore();
         }
     }
 
