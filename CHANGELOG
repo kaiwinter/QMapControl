@@ -1,3 +1,9 @@
+0.9.6.2 (2014-02-15)
+=====
+- FIXED: Restored Zooming via Mouse wheel to be enabled by default
+- FIXED: Zooming with Mouse Wheel now ignores the Horizontal axis
+- FIXED (BUG #11) - removed isVisble() within paint method which prevented rendering qmapcontrol to pixmaps
+
 0.9.6.1 (2013-10-06)
 =====
 - ADDED: Cleanup support when calling Layer::removeGeometry() and Layer::clearGeometries()
