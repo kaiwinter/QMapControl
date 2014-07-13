@@ -1,4 +1,8 @@
 #include "mapviewer.h"
+
+#include <QPushButton>
+#include <QVBoxLayout>
+
 /*!
  * \example mapviewer.cpp
  * This application is just a simple map viewer. A Mapadapter is created (OpenStreetmaps) 
@@ -30,6 +34,7 @@ Mapviewer::Mapviewer(QWidget *parent)
     // show mapcontrol in mainwindow
     setCentralWidget(mc);
 }
+
 void Mapviewer::addZoomButtons()
 {
     // create buttons as controls for zoom
@@ -49,7 +54,6 @@ void Mapviewer::addZoomButtons()
     innerlayout->addWidget(zoomout);
     mc->setLayout(innerlayout);
 }
-
 
 Mapviewer::~Mapviewer()
 {

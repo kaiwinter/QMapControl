@@ -71,6 +71,7 @@ namespace qmapcontrol
         QPixmap prefetchImage(const QString& host, const QString& path);
 
         void receivedImage(const QPixmap pixmap, const QString& url);
+        void fetchFailed(const QString &url);
 
         /*!
          * This method is called by MapNetwork, after all images in its queue were loaded.
@@ -92,8 +93,10 @@ namespace qmapcontrol
          * This is not provided by the current Qtopia version!
          * @param host the proxy큦 hostname or ip
          * @param port the proxy큦 port
+         * @param username the proxy큦 username
+         * @param password the proxy큦 password
          */
-        void setProxy(QString host, int port);
+        void setProxy(QString host, int port, const QString username = QString(), const QString password = QString());
 
         //! sets the cache directory for persistently saving map tiles
         /*!
@@ -130,6 +133,8 @@ namespace qmapcontrol
         bool tileExist(QString tileName);
         bool tileCacheExpired(QString tileName);
         QString md5hex( QString qUrl );
+
+        QHash<QString,QDateTime> failedFetches;
 
     signals:
         void imageReceived();

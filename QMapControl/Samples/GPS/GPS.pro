@@ -5,6 +5,11 @@ OBJECTS_DIR = obj
 DESTDIR = ../bin
 TARGET = GPS
 
+QT+=network
+QT+=gui
+greaterThan(QT_MAJOR_VERSION, 4): QT += widgets
+greaterThan(QT_MAJOR_VERSION, 4): cache()
+
 # Input
 SOURCES += src/gps.cpp \
 src/main.cpp \

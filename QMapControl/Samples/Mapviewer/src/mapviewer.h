@@ -1,7 +1,7 @@
 #ifndef MAPVIEWER_H
 #define MAPVIEWER_H
-
-#include <QtGui>
+#include <QApplication>
+#include <QMainWindow>
 #include <mapcontrol.h>
 #include <osmmapadapter.h>
 #include <maplayer.h>

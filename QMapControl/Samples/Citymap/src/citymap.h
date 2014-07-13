@@ -1,8 +1,6 @@
 #ifndef CITYMAP_H
 #define CITYMAP_H
 
-#include <QtGui>
-
 #include <mapcontrol.h>
 #include <osmmapadapter.h>
 #include <yahoomapadapter.h>
@@ -11,8 +9,8 @@
 #include <geometrylayer.h>
 #include <linestring.h>
 #include <imagepoint.h>
-
 #include "dialogs.h"
+#include <QMainWindow>
 
 using namespace qmapcontrol;
 class Citymap: public QMainWindow

@@ -24,6 +24,9 @@
 */
 
 #include "mapnetwork.h"
+#include <QNetworkRequest>
+#include <QUrl>
+#include <QMapIterator>
 #include <QWaitCondition>
 
 #include <QMutexLocker>
@@ -32,20 +35,25 @@ namespace qmapcontrol
 {
     MapNetwork::MapNetwork(ImageManager* parent)
         :   parent(parent), 
-            http(new QHttp(this)), 
+            http(new QNetworkAccessManager(this)), 
             loaded(0), 
             networkActive( false )
     {
-        connect(this->http, SIGNAL(proxyAuthenticationRequired(QNetworkProxy,QAuthenticator*)),
-                this, SLOT(proxyAuthenticationRequired(QNetworkProxy,QAuthenticator*)));
-
-        connect(this->http, SIGNAL(requestFinished(int, bool)),
-                this, SLOT(requestFinished(int, bool)));
+        connect(this->http, SIGNAL(finished(QNetworkReply *)),
+                this, SLOT(requestFinished(QNetworkReply *)));
     }
 
     MapNetwork::~MapNetwork()
     {
-        http->clearPendingRequests();
+
+        foreach(QNetworkReply *reply, replyList)
+        {
+            if(reply->isRunning())
+            {
+                reply->abort();
+            }
+            reply->deleteLater();
+        }
         delete http;
     }
 
@@ -55,62 +63,60 @@ namespace qmapcontrol
         QString portNumber = QString("80");
 
         QRegExp r(".:.");
-        
+
         if(r.indexIn(host) >= 0)
         {
             QStringList s = host.split(":");
 
             hostName = s.at(0);
             portNumber = s.at(1);
-            
-            http->setHost(hostName, portNumber.toInt());
         }
-        else
-        {
-            http->setHost(hostName, portNumber.toInt());
-        }
-        
-        QHttpRequestHeader header("GET", url);
-        header.setValue("User-Agent", "Mozilla");
-        header.setValue("Host", host);
-        int getId = http->request(header);
-
+        QUrl finalUrl = QUrl(QString("http://%1:%2%3").arg(hostName).arg(portNumber).arg(url));
+        QNetworkRequest request (finalUrl);
+        request.setRawHeader("User-Agent", "Mozilla/5.0 (PC; U; Intel; Linux; en) AppleWebKit/420+ (KHTML, like Gecko)");
+        replyList.append(http->get(request));
         QMutexLocker lock(&vectorMutex);
-        loadingMap[getId] = url;
-    }
+        loadingMap[finalUrl.toString()] = url;
+}
 
-    void MapNetwork::requestFinished(int id, bool error)
+    void MapNetwork::requestFinished(QNetworkReply *reply)
     {
-        //qDebug() << "MapNetwork::requestFinished" << http->state() << ", id: " << id;
-        if (!error)
+        //qDebug() << "MapNetwork::requestFinished" << reply->url().toString();
+        if (reply->error() == QNetworkReply::NoError)
         {
+            QString id = reply->url().toString();
             // check if id is in map?
-          bool idInMap = false;
-          QString url;
-          {
-            QMutexLocker lock(&vectorMutex);
-            idInMap = loadingMap.contains(id);
-            if(idInMap) {
-              url = loadingMap[id];
-              loadingMap.remove(id);
+            bool idInMap = false;
+            QString url;
+            {
+                QMutexLocker lock(&vectorMutex);
+                idInMap = loadingMap.contains(id);
+                if(idInMap)
+                {
+                    url = loadingMap[id];
+                    loadingMap.remove(id);
+                }
             }
-          }
           
             if (idInMap)
             {
-                // qDebug() << "request finished for id: " << id << ", belongs to: " << notifier.url << endl;
+                //qDebug() << "request finished for reply: " << reply << ", belongs to: " << url << endl;
                 QByteArray ax;
 
-                if (http->bytesAvailable()>0)
+                if (reply->bytesAvailable()>0)
                 {
                     QPixmap pm;
-                    ax = http->readAll();
+                    ax = reply->readAll();
 
-                    if (pm.loadFromData(ax))
+                    if (pm.loadFromData(ax) && pm.size().width() > 1 && pm.size().height() > 1)
                     {
                         loaded += pm.size().width()*pm.size().height()*pm.depth()/8/1024;
-                        // qDebug() << "Network loaded: " << (loaded);
+                        //qDebug() << "Network loaded: " << loaded << " width:" << pm.size().width() << " height:" <<pm.size().height();
                         parent->receivedImage(pm, url);
+                    }
+                    else
+                    {
+                        parent->fetchFailed(url);
                     }
                 }
             }
@@ -118,9 +124,12 @@ namespace qmapcontrol
 
         if (loadQueueSize() == 0)
         {
-            // qDebug () << "all loaded";
+            qDebug () << "all loaded";
             parent->loadingQueueEmpty();
         }
+        replyList.removeOne(reply);
+        reply->deleteLater();
+        reply=NULL;
     }
 
     int MapNetwork::loadQueueSize() const
@@ -131,9 +140,18 @@ namespace qmapcontrol
 
     void MapNetwork::abortLoading()
     {
-        http->clearPendingRequests();
-
         QMutexLocker lock(&vectorMutex);
+
+        foreach(QNetworkReply *reply, replyList)
+        {
+            if(reply->isRunning())
+            {
+                reply->abort();
+            }
+            reply->deleteLater();
+        }
+
+        replyList.clear();
         loadingMap.clear();
     }
 
@@ -143,37 +161,14 @@ namespace qmapcontrol
         return loadingMap.values().contains(url);
     }
 
-    void MapNetwork::setProxy(QString host, int port)
+    void MapNetwork::setProxy(const QString host, const int port, const QString username, const QString password)
     {
 #ifndef Q_WS_QWS
         // do not set proxy on qt/extended
-        http->setProxy(host, port);
+        QNetworkProxy proxy = QNetworkProxy(QNetworkProxy::HttpProxy, host, port);
+        proxy.setUser(username);
+        proxy.setPassword(password);
+        http->setProxy(proxy);
 #endif
-    }
-
-    void MapNetwork::proxyAuthenticationRequired(const QNetworkProxy &proxy, QAuthenticator *authenticator)
-    {
-        qDebug() << "Proxy Aut req" << proxy.hostName() << &authenticator;
-        QDialog dialog;
-        QGridLayout layout;
-        QLabel username, password;
-        username.setText("Username:");
-        password.setText("Password:");
-        layout.addWidget(&username, 0, 0);
-        layout.addWidget(&password, 1, 0);
-        QLineEdit user, pass;
-        pass.setEchoMode(QLineEdit::Password);
-        connect(&user, SIGNAL(returnPressed()), &dialog, SLOT(accept()));
-        connect(&pass, SIGNAL(returnPressed()), &dialog, SLOT(accept()));
-        layout.addWidget(&user, 0, 1);
-        layout.addWidget(&pass, 1, 1);
-        QPushButton button;
-        button.setText("OK");
-        connect(&button, SIGNAL(clicked()), &dialog, SLOT(accept()));
-        layout.addWidget(&button, 2, 0, 1, 2, Qt::AlignCenter);
-        dialog.setLayout(&layout);
-        dialog.exec();
-        authenticator->setUser(user.text());
-        authenticator->setPassword(pass.text());
     }
 }

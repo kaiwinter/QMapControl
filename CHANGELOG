@@ -1,3 +1,13 @@
+0.9.7.0 (2014-07-13)
+=====
+- ADDED: Proxy username and password support added to addProxy() method
+- REMOVED: Prompt username/password prompt when proxy requires authentication
+- FIXED (BUG #13) - update-loop when requesting a tile and server returns a non-image
+- FIXED (BUG #12) - updated user agent which prevent OpenStreetMaps from working
+- FIXED (BUG #8) - fixed memory leak in Line::addPoint()
+- NEW: Added Qt5 support (Thank you to Jon Schewe and Stevokm for patches)
+
+
 0.9.6.2 (2014-02-15)
 =====
 - FIXED: Restored Zooming via Mouse wheel to be enabled by default

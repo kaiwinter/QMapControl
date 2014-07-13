@@ -1,4 +1,9 @@
 #include "multidemo.h"
+
+#include <QHBoxLayout>
+#include <QVBoxLayout>
+#include <QMessageBox>
+
 /*!
  * \example multidemo.cpp
  * This is a bit complexer application, which lets you play around.

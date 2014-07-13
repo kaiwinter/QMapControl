@@ -10,8 +10,14 @@
  * \image html sample_citymap.png "screenshot"
  */
 
-
 #include "citymap.h"
+
+#include <QTextEdit>
+#include <QVBoxLayout>
+#include <QApplication>
+#include <QPushButton>
+#include <QAction>
+#include <QMenuBar>
 
 Citymap::Citymap(QWidget*)
 {
@@ -27,7 +33,7 @@ Citymap::Citymap(QWidget*)
 	setCentralWidget(w);
 
 	
-	notepixmap = new QPixmap(QCoreApplication::applicationDirPath() + "/images/note.png");
+    notepixmap = new QPixmap(QApplication::applicationDirPath() + "/images/note.png");
 	
 	coord1 = QPointF();
 	coord2 = QPointF();

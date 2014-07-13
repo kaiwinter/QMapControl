@@ -12,6 +12,11 @@
  * \image html sample_gps.png "screenshot"
  * @see http://3rdparty.downloads.openmoko.org
  */
+
+#include <QPushButton>
+#include <QHBoxLayout>
+#include <QVBoxLayout>
+
 GPS::GPS()
 {
 	// create MapControl

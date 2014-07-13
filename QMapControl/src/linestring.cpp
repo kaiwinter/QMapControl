@@ -62,6 +62,7 @@ namespace qmapcontrol
 
     void LineString::addPoint(Point* point)
     {
+        point->setParentGeometry(this);
         childPoints.append(point);
     }
 
