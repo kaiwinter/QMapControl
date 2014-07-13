@@ -24,6 +24,8 @@
 */
 
 #include "mapcontrol.h"
+#include <QTimer>
+
 namespace qmapcontrol
 {
 
@@ -522,9 +524,9 @@ namespace qmapcontrol
         ImageManager::instance()->setCacheDir(tileExpiry, path);
     }
 
-    void MapControl::setProxy(QString host, int port)
+    void MapControl::setProxy(QString host, int port, const QString username, const QString password)
     {
-        ImageManager::instance()->setProxy(host, port);
+        ImageManager::instance()->setProxy(host, port, username, password);
     }
 
     void MapControl::showScale(bool visible)

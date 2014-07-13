@@ -1,7 +1,8 @@
 #ifndef GPS_H
 #define GPS_H
 
-#include <QtGui>
+#include <QPushButton>
+#include <QLabel>
 #include <mapcontrol.h>
 #include "gps_neo.h"
 using namespace qmapcontrol;

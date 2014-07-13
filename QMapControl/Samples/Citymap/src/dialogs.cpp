@@ -1,4 +1,5 @@
 #include "dialogs.h"
+#include <QHBoxLayout>
 
 InfoDialog::InfoDialog(QWidget* parent)
 	: QDialog(parent)

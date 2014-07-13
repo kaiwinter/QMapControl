@@ -1,7 +1,6 @@
 #ifndef LINESANDPOINTS_H
 #define LINESANDPOINTS_H
 
-#include <QtGui>
 #include <mapcontrol.h>
 #include <osmmapadapter.h>
 #include <maplayer.h>

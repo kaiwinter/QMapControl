@@ -27,13 +27,13 @@
 #define MAPCONTROL_H
 
 #include "qmapcontrol_global.h"
-#include <QtGui>
-
 #include "layermanager.h"
 #include "layer.h"
 #include "mapadapter.h"
 #include "geometry.h"
 #include "imagemanager.h"
+
+#include <QWidget>
 
 //! QMapControl namespace
 namespace qmapcontrol
@@ -238,8 +238,10 @@ namespace qmapcontrol
          * This is not provided by the current Qtopia version!
          * @param host the proxy´s hostname or ip
          * @param port the proxy´s port
+         * @param username the proxy´s username
+         * @param password the proxy´s password
          */
-        void setProxy ( QString host, int port );
+        void setProxy(QString host, int port, const QString username = QString(), const QString password = QString());
 
         //! Displays the scale within the widget
         /*!

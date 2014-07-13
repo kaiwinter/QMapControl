@@ -25,7 +25,15 @@
 
 #ifndef POINT_H
 #define POINT_H
-#include <QWidget>
+
+//#include "qglobal.h"
+#if QT_VERSION >= 0x050000
+    // Qt5 code
+    //#include <QtWidgets>
+#else
+    // Qt4 code
+    #include <QWidget>
+#endif
 
 #include "qmapcontrol_global.h"
 #include "geometry.h"

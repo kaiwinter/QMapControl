@@ -1,7 +1,8 @@
 #ifndef DIALOGS_H
 #define DIALOGS_H
 
-#include <QtGui>
+#include <QDialog>
+#include <QTextEdit>
 
 /**
 	@author Kai Winter <kaiwinter@gmx.de>

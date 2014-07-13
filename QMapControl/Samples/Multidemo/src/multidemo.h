@@ -1,7 +1,7 @@
 #ifndef MULTIDEMO_H
 #define MULTIDEMO_H
 
-#include <QtGui>
+#include <QPushButton>
 #include <mapcontrol.h>
 #include <imagepoint.h>
 #include <maplayer.h>

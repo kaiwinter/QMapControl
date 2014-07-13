@@ -57,7 +57,7 @@ namespace qmapcontrol
     {
         // Point(x, y, name, alignment);
         GeometryType = "Point";
-        mypixmap = 0;
+        mypixmap = QPixmap();
         visible = true;
         size = widget->size();
         homelevel = -1;

@@ -29,16 +29,12 @@
 #include "qmapcontrol_global.h"
 #include <QObject>
 #include <QDebug>
-#include <QHttp>
+#include <QNetworkAccessManager>
+#include <QNetworkReply>
 #include <QNetworkProxy>
 #include <QAuthenticator>
 #include <QVector>
 #include <QPixmap>
-#include <QDialog>
-#include <QLabel>
-#include <QPushButton>
-#include <QLineEdit>
-#include <QGridLayout>
 #include <QMutex>
 #include "imagemanager.h"
 
@@ -70,7 +66,7 @@ namespace qmapcontrol
          * This is useful when changing the zoom-factor, though newly needed images loads faster
          */
         void abortLoading();
-        void setProxy(QString host, int port);
+        void setProxy(QString host, int port, const QString username = QString(), const QString password = QString());
 
         /*!
         *
@@ -79,18 +75,18 @@ namespace qmapcontrol
         int loadQueueSize() const;
 
     private:
+        Q_DISABLE_COPY (MapNetwork)
+
         ImageManager* parent;
-        QHttp* http;
-        QMap<int, QString> loadingMap;
+        QNetworkAccessManager* http;
+        QList<QNetworkReply*> replyList;
+        QMap<QString, QString> loadingMap;
         qreal loaded;
         mutable QMutex vectorMutex;
         bool    networkActive;
-        MapNetwork& operator=(const MapNetwork& rhs);
-        MapNetwork(const MapNetwork& old);
 
     private slots:
-        void requestFinished(int id, bool error);
-        void proxyAuthenticationRequired(const QNetworkProxy &proxy, QAuthenticator *authenticator);
+        void requestFinished(QNetworkReply *reply);
     };
 }
 #endif

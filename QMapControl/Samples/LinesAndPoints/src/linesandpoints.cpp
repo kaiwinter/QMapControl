@@ -15,6 +15,12 @@
  * You can find this example here: MapAPI/Samples/LinesAndPoints
  * \image html sample_linesandpoints.png "screenshot"
  */
+
+#include <QPushButton>
+#include <QHBoxLayout>
+#include <QVBoxLayout>
+#include <QMessageBox>
+
 LinesAndPoints::LinesAndPoints(QWidget *parent)
 	: QWidget(parent)
 {

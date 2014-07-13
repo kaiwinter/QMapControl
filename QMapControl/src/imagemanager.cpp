@@ -26,6 +26,9 @@
 #include "imagemanager.h"
 #include <QCryptographicHash>
 #include <QPainter>
+#include <QDateTime>
+
+#define FAILED_TIMEOUT_SECONDS 30
 
 namespace qmapcontrol
 {
@@ -103,6 +106,11 @@ namespace qmapcontrol
             //we had a valid copy cached in memory (not disk) so return this
             return pm;
         }
+        else if ( failedFetches.contains(url) && failedFetches[url].secsTo(QDateTime::currentDateTime()) > FAILED_TIMEOUT_SECONDS )
+        {
+            //prevents spamming public servers when requests fail to return an image or server returns error code (busy/ivalid useragent etc)
+            qDebug() << "Ignored: " << url << " - last request failed less than 30 seconds ago";
+        }
         else
         {
             //load from net, add empty image
@@ -127,6 +135,12 @@ namespace qmapcontrol
     {
         //qDebug() << "ImageManager::receivedImage";
         QPixmapCache::insert(md5hex(url), pixmap);
+
+        //remove from failed list (if exists) as it has now come good
+        if (failedFetches.contains(url))
+        {
+            failedFetches.remove(url);
+        }
 
         if (doPersistentCaching && !tileExist(url))
         {
@@ -163,9 +177,10 @@ namespace qmapcontrol
     {
         net->abortLoading();
     }
-    void ImageManager::setProxy(QString host, int port)
+
+    void ImageManager::setProxy(QString host, int port, const QString username, const QString password)
     {
-        net->setProxy(host, port);
+        net->setProxy(host, port, username, password);
     }
 
     void ImageManager::setCacheDir(int expiry, const QDir& path)
@@ -246,4 +261,13 @@ namespace qmapcontrol
     {
         return net->loadQueueSize();
     }
+
+    void qmapcontrol::ImageManager::fetchFailed(const QString &url)
+    {
+        qDebug() << "ImageManager::fetchFailed" << url;
+
+        //store current time for this failed image to prevent loading it again until
+        failedFetches.insert(url, QDateTime::currentDateTime());
+    }
+
 }

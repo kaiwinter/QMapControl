@@ -1,4 +1,4 @@
-#include <QtCore/QtGlobal>
+#include <QtGlobal>
 
 #ifdef QMAPCONTROL_LIBRARY
 #  define QMAPCONTROL_EXPORT Q_DECL_EXPORT
