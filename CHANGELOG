@@ -1,3 +1,7 @@
+0.9.7.1 (2014-07-29)
+=====
+- FIXED (Patch#8) - Deadlock in network requests when aborting connections (Thanks to Jon Schewe)
+
 0.9.7.0 (2014-07-13)
 =====
 - ADDED: Proxy username and password support added to addProxy() method
