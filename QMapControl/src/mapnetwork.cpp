@@ -74,8 +74,9 @@ namespace qmapcontrol
         QUrl finalUrl = QUrl(QString("http://%1:%2%3").arg(hostName).arg(portNumber).arg(url));
         QNetworkRequest request (finalUrl);
         request.setRawHeader("User-Agent", "Mozilla/5.0 (PC; U; Intel; Linux; en) AppleWebKit/420+ (KHTML, like Gecko)");
-        replyList.append(http->get(request));
+
         QMutexLocker lock(&vectorMutex);
+        replyList.append(http->get(request));
         loadingMap[finalUrl.toString()] = url;
 }
 
@@ -127,7 +128,11 @@ namespace qmapcontrol
             qDebug () << "all loaded";
             parent->loadingQueueEmpty();
         }
-        replyList.removeOne(reply);
+        {
+            QMutexLocker lock(&vectorMutex);
+            replyList.removeOne(reply);
+        }
+
         reply->deleteLater();
         reply=NULL;
     }
@@ -140,10 +145,11 @@ namespace qmapcontrol
 
     void MapNetwork::abortLoading()
     {
-        QMutexLocker lock(&vectorMutex);
-
-        foreach(QNetworkReply *reply, replyList)
+        // be sure that replyList is copied in case it's modified in another thread
+        QListIterator<QNetworkReply *> iter(replyList);
+        while(iter.hasNext())
         {
+            QNetworkReply *reply = iter.next();
             if(reply->isRunning())
             {
                 reply->abort();
@@ -151,6 +157,7 @@ namespace qmapcontrol
             reply->deleteLater();
         }
 
+        QMutexLocker lock(&vectorMutex);
         replyList.clear();
         loadingMap.clear();
     }
