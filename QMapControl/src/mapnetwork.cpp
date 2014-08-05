@@ -71,18 +71,25 @@ namespace qmapcontrol
             hostName = s.at(0);
             portNumber = s.at(1);
         }
-        QUrl finalUrl = QUrl(QString("http://%1:%2%3").arg(hostName).arg(portNumber).arg(url));
-        QNetworkRequest request (finalUrl);
+
+        QString finalUrl = QString("http://%1:%2%3").arg(hostName).arg(portNumber).arg(url);
+        QNetworkRequest request = QNetworkRequest(QUrl(finalUrl));
         request.setRawHeader("User-Agent", "Mozilla/5.0 (PC; U; Intel; Linux; en) AppleWebKit/420+ (KHTML, like Gecko)");
 
         QMutexLocker lock(&vectorMutex);
         replyList.append(http->get(request));
-        loadingMap[finalUrl.toString()] = url;
+        loadingMap.insert(finalUrl, url );
 }
 
     void MapNetwork::requestFinished(QNetworkReply *reply)
     {
-        //qDebug() << "MapNetwork::requestFinished" << reply->url().toString();
+        if (!reply)
+        {
+            qDebug() << "MapNetwork::requestFinished - reply no longer valid";
+            return;
+        }
+
+        qDebug() << "MapNetwork::requestFinished" << reply->url().toString();
         if (reply->error() == QNetworkReply::NoError)
         {
             QString id = reply->url().toString();
@@ -101,7 +108,7 @@ namespace qmapcontrol
           
             if (idInMap)
             {
-                //qDebug() << "request finished for reply: " << reply << ", belongs to: " << url << endl;
+                qDebug() << "request finished for reply: " << reply << ", belongs to: " << url << endl;
                 QByteArray ax;
 
                 if (reply->bytesAvailable()>0)
@@ -128,13 +135,12 @@ namespace qmapcontrol
             qDebug () << "all loaded";
             parent->loadingQueueEmpty();
         }
-        {
-            QMutexLocker lock(&vectorMutex);
-            replyList.removeOne(reply);
-        }
+
+        QMutexLocker lock(&vectorMutex);
+        replyList.removeAll(reply);
 
         reply->deleteLater();
-        reply=NULL;
+        reply = 0;
     }
 
     int MapNetwork::loadQueueSize() const
@@ -145,18 +151,22 @@ namespace qmapcontrol
 
     void MapNetwork::abortLoading()
     {
+        qDebug() << "MapNetwork::abortLoading";
         // be sure that replyList is copied in case it's modified in another thread
         QListIterator<QNetworkReply *> iter(replyList);
         while(iter.hasNext())
         {
             QNetworkReply *reply = iter.next();
-            if(reply->isRunning())
+            if (reply)
             {
-                reply->abort();
+                if(reply->isRunning())
+                {
+                    reply->abort();
+                }
+                reply->deleteLater();
+                reply = 0;
             }
-            reply->deleteLater();
         }
-
         QMutexLocker lock(&vectorMutex);
         replyList.clear();
         loadingMap.clear();
