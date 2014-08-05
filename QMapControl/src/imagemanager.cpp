@@ -28,7 +28,8 @@
 #include <QPainter>
 #include <QDateTime>
 
-#define FAILED_TIMEOUT_SECONDS 30
+static const int kDefaultTimeoutDelaySecs = 30;
+static const int kDefaultPixmapCacheSizeKB = 20000;
 
 namespace qmapcontrol
 {
@@ -53,9 +54,9 @@ namespace qmapcontrol
 
         paint.end();
 
-        if (QPixmapCache::cacheLimit() <= 20000)
+        if (QPixmapCache::cacheLimit() <= kDefaultPixmapCacheSizeKB)
         {
-            QPixmapCache::setCacheLimit(20000);	// in kB
+            QPixmapCache::setCacheLimit(kDefaultPixmapCacheSizeKB);
         }
     }
 
@@ -106,7 +107,8 @@ namespace qmapcontrol
             //we had a valid copy cached in memory (not disk) so return this
             return pm;
         }
-        else if ( failedFetches.contains(url) && failedFetches[url].secsTo(QDateTime::currentDateTime()) > FAILED_TIMEOUT_SECONDS )
+        else if ( failedFetches.contains(url) &&
+                  failedFetches[url].secsTo(QDateTime::currentDateTime()) < kDefaultTimeoutDelaySecs )
         {
             //prevents spamming public servers when requests fail to return an image or server returns error code (busy/ivalid useragent etc)
             qDebug() << "Ignored: " << url << " - last request failed less than 30 seconds ago";

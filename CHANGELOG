@@ -1,3 +1,8 @@
+0.9.7.2 (2014-08-5)
+=====
+- FIXED (BUG #14) - Failed fetches will never try again due to logic error
+- FIXED - Crash in NetworkManager when loading lots of images and then aborting too quickly
+
 0.9.7.1 (2014-07-29)
 =====
 - FIXED (Patch#8) - Deadlock in network requests when aborting connections (Thanks to Jon Schewe)
