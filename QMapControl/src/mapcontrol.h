@@ -286,6 +286,7 @@ namespace qmapcontrol
          * @return view port rect
          */
         QRectF getViewport();
+
         //! returns if a geometry is visible on viewport
         /*!
          *
@@ -293,6 +294,13 @@ namespace qmapcontrol
          * @return true if geometry is visible
          */
         bool isGeometryVisible( Geometry * geometry);
+
+        //! returns loading images queue size
+        /*!
+         *
+         * @return int pending loading images (queue size)
+         */
+        int loadingQueueSize();
 
     private:
         LayerManager* layermanager;

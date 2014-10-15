@@ -194,7 +194,7 @@ namespace qmapcontrol
         {
             QList<double> distanceList;
             distanceList<<5000000<<2000000<<1000000<<1000000<<1000000<<100000<<100000<<50000<<50000<<10000<<10000<<10000<<1000<<1000<<500<<200<<100<<50<<25;
-            if (currentZoom() >= 0 && distanceList.size() > currentZoom())
+            if (currentZoom() >= layermanager->minZoom() && distanceList.size() > currentZoom())
             {
                 double line;
                 line = distanceList.at( currentZoom() ) / pow(2.0, 18-currentZoom() ) / 0.597164;
@@ -250,7 +250,8 @@ namespace qmapcontrol
             QRect rect = QRect(pre_click_px, current_mouse_pos);
             painter.drawRect(rect);
         }
-        //emit viewChanged(currentCoordinate(), currentZoom());
+
+        painter.end();
     }
 
     // mouse events
@@ -334,7 +335,7 @@ namespace qmapcontrol
         {
             if(evnt->delta() > 0)
             {
-                if( currentZoom() == 17 )
+                if( currentZoom() == layermanager->maxZoom() )
                 {
                     return;
                 }
@@ -344,7 +345,7 @@ namespace qmapcontrol
             }
             else
             {
-                if( currentZoom() == 0 )
+                if( currentZoom() == layermanager->minZoom() )
                 {
                     return;
                 }
@@ -386,11 +387,6 @@ namespace qmapcontrol
     // slots
     void MapControl::zoomIn()
     {
-        if( currentZoom() == 17 )
-        {
-            return;
-        }
-
         layermanager->zoomIn();
         updateView();
         emit viewChanged(currentCoordinate(), currentZoom());
@@ -398,11 +394,6 @@ namespace qmapcontrol
 
     void MapControl::zoomOut()
     {
-        if( currentZoom() == 0 )
-        {
-            return;
-        }
-
         layermanager->zoomOut();
         updateView();
         emit viewChanged(currentCoordinate(), currentZoom());
@@ -410,13 +401,6 @@ namespace qmapcontrol
 
     void MapControl::setZoom(int zoomlevel)
     {
-        if ( currentZoom() == zoomlevel ||
-             zoomlevel < 0 ||
-             zoomlevel > 17 )
-        {
-            return;
-        }
-
         layermanager->setZoom(zoomlevel);
         updateView();
         emit viewChanged(currentCoordinate(), currentZoom());
@@ -488,9 +472,9 @@ namespace qmapcontrol
 
     void MapControl::loadingFinished()
     {
-        // qDebug() << "MapControl::loadingFinished()";
         layermanager->removeZoomImage();
     }
+
     void MapControl::addLayer(Layer* layer)
     {
         layermanager->addLayer(layer);
@@ -593,5 +577,10 @@ namespace qmapcontrol
            return false;
 
        return getViewport().contains( geometry->boundingBox() );
+   }
+
+   int MapControl::loadingQueueSize()
+   {
+       return ImageManager::instance()->loadQueueSize();
    }
 }

@@ -12,6 +12,8 @@
 #include "dialogs.h"
 #include <QMainWindow>
 
+class QLabel;
+
 using namespace qmapcontrol;
 class Citymap: public QMainWindow
 {
@@ -42,6 +44,7 @@ class Citymap: public QMainWindow
                 QMenu* tourMenu;
                 QMenu* toolsMenu;
                 QMenu* mapMenu;
+                QMenu* zoomMenu;
 
                 QAction* toggleSights;
                 QAction* togglePub;
@@ -53,12 +56,17 @@ class Citymap: public QMainWindow
 
                 QAction* addNoteAction;
                 QAction* toolsDistance;
+                QAction* toolsLocalDiskCache;
 
                 QAction* osmAction;
                 QAction* yahooActionMap;
                 QAction* yahooActionSatellite;
                 QAction* yahooActionOverlay;
                 QAction* googleActionMap;
+
+                QList<QAction*> zoomActions;
+
+                QStatusBar* statusBar;
 
                 bool ignoreClicks;
                 bool addingNote;
@@ -82,6 +90,8 @@ class Citymap: public QMainWindow
                 int noteID;
                 int currentnoteID;
                 QHash<int, QString> notestext;
+                QLabel* loadingProgress;
+                QTimer* loadingProgressTimer;
 
         public slots:
                 void hideNote(const QMouseEvent* evnt, const QPointF coordinate);
@@ -91,9 +101,14 @@ class Citymap: public QMainWindow
                 void writeNote(const QMouseEvent*, const QPointF);
                 void calcDistance();
                 void calcDistanceClick(const QMouseEvent*, const QPointF);
+                void mapControlZoomChanged(const QPointF &coordinate, int zoom ) const;
 
                 void mapproviderSelected(QAction*);
+                void mapZoomSelected(QAction*);
                 void editNote(Geometry* geom, QPoint point);
+                void resizeEvent(QResizeEvent *qEvent);
+                void updateProgress();
+                void cacheTiles(bool qEnabled);
 };
 
 #endif
