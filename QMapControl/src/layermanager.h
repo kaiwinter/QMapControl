@@ -117,6 +117,12 @@ namespace qmapcontrol
         //! zooms out one step
         void zoomOut();
 
+        //! return min Zoom Level
+        int minZoom();
+
+        //! return max Zoom Level
+        int maxZoom();
+
         //! sets the given zoomlevel
         /*!
          * @param zoomlevel the zoomlevel
@@ -230,7 +236,6 @@ namespace qmapcontrol
         QSize offSize; // size of the offscreen image
 
         QPixmap composedOffscreenImage;
-        QPixmap composedOffscreenImage2;
         QPixmap zoomImage;
 
         QList<Layer*>	mylayers;

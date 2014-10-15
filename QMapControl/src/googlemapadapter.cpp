@@ -36,6 +36,7 @@ namespace qmapcontrol
     GoogleMapAdapter::~GoogleMapAdapter()
     {
     }
+
     QString GoogleMapAdapter::typeToString( googleLayerType qLayerType )
     {
         switch (qLayerType)

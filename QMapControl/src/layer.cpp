@@ -255,9 +255,13 @@ namespace qmapcontrol
 
         if (mapAdapter->isValid(mapmiddle_tile_x, mapmiddle_tile_y, mapAdapter->currentZoom()))
         {
-            painter->drawPixmap(-cross_x+size.width(),
-                                -cross_y+size.height(),
-                                ImageManager::instance()->getImage(mapAdapter->host(), mapAdapter->query(mapmiddle_tile_x, mapmiddle_tile_y, mapAdapter->currentZoom())));
+            QPixmap tile = ImageManager::instance()->getImage(mapAdapter->host(), mapAdapter->query(mapmiddle_tile_x, mapmiddle_tile_y, mapAdapter->currentZoom()));
+            if ( !tile.isNull() )
+            {
+                painter->drawPixmap(-cross_x+size.width(),
+                                    -cross_y+size.height(),
+                                    tile );
+            }
         }
 
         for (int i=-tiles_left+mapmiddle_tile_x; i<=tiles_right+mapmiddle_tile_x; i++)
@@ -266,14 +270,18 @@ namespace qmapcontrol
             {
                 // check if image is valid
                 if (!(i==mapmiddle_tile_x && j==mapmiddle_tile_y))
+                {
                     if (mapAdapter->isValid(i, j, mapAdapter->currentZoom()))
                     {
 
-                    painter->drawPixmap(((i-mapmiddle_tile_x)*tilesize)-cross_x+size.width(),
-                                        ((j-mapmiddle_tile_y)*tilesize)-cross_y+size.height(),
-                                        ImageManager::instance()->getImage(mapAdapter->host(), mapAdapter->query(i, j, mapAdapter->currentZoom())));
-                    //if (QCoreApplication::hasPendingEvents())
-                    //  QCoreApplication::processEvents();
+                        QPixmap tile = ImageManager::instance()->getImage(mapAdapter->host(), mapAdapter->query(i, j, mapAdapter->currentZoom()));
+                        if ( !tile.isNull() )
+                        {
+                            painter->drawPixmap(((i-mapmiddle_tile_x)*tilesize)-cross_x+size.width(),
+                                                ((j-mapmiddle_tile_y)*tilesize)-cross_y+size.height(),
+                                                tile);
+                        }
+                    }
                 }
             }
         }

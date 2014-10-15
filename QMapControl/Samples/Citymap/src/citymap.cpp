@@ -18,20 +18,24 @@
 #include <QPushButton>
 #include <QAction>
 #include <QMenuBar>
+#include <QStatusBar>
+#include <QLabel>
+#include <QTimer>
 
 Citymap::Citymap(QWidget*)
 {
 	// create MapControl
 	mc = new MapControl(QSize(380,540));
     mc->showScale(true);
+    mc->enablePersistentCache(); //5 min expiry
 	// display the MapControl in the application
 	QVBoxLayout* layout = new QVBoxLayout;
 	layout->addWidget(mc);
+    layout->setContentsMargins(0,0,0,0);
 	
 	QWidget* w = new QWidget();
 	w->setLayout(layout);
 	setCentralWidget(w);
-
 	
     notepixmap = new QPixmap(QApplication::applicationDirPath() + "/images/note.png");
 	
@@ -49,8 +53,7 @@ Citymap::Citymap(QWidget*)
 	mc->addLayer(overlay);
 		
 	notes = new GeometryLayer("Notes", mapadapter);
-	
-	
+
 	createTours();
 	addSights();
 	addPubs();
@@ -59,6 +62,8 @@ Citymap::Citymap(QWidget*)
 	addZoomButtons();
 	createActions();
 	createMenus();
+
+    connect(mc, SIGNAL(viewChanged(QPointF,int)), this, SLOT(mapControlZoomChanged(QPointF,int)), Qt::QueuedConnection);
 	
 	mc->addLayer(notes);
 	connect(notes, SIGNAL(geometryClicked(Geometry*, QPoint)),
@@ -77,7 +82,28 @@ Citymap::Citymap(QWidget*)
 	notepoint = new Point(0, 0, notetextedit, ".", Point::TopLeft);
 	notepoint->setVisible(false);
 	notes->addGeometry(notepoint);
-	
+
+    statusBar = new QStatusBar( this );
+    setStatusBar(statusBar);
+
+    loadingProgress = new QLabel("");
+    statusBar->addWidget( loadingProgress );
+    loadingProgressTimer = new QTimer(this);
+    connect(loadingProgressTimer, SIGNAL(timeout()), this, SLOT(updateProgress()), Qt::QueuedConnection );
+    loadingProgressTimer->start( 500 ); //update every 500ms
+}
+
+void Citymap::updateProgress()
+{
+    QString progressText = QString(" %1 tiles remaining").arg(mc->loadingQueueSize());
+
+    loadingProgress->setText( progressText );
+}
+
+void Citymap::cacheTiles(bool qEnabled)
+{
+    //cache will be set at 1hr (60min) if enabled
+    mc->enablePersistentCache( qEnabled ? 60 : -1 );
 }
 
 void Citymap::createTours()
@@ -225,7 +251,7 @@ void Citymap::addZoomButtons()
 	zoomout->setMaximumWidth(50);
 	
 	connect(zoomin, SIGNAL(clicked(bool)),
-			  mc, SLOT(zoomIn()));
+              mc, SLOT(zoomIn()));
 	connect(zoomout, SIGNAL(clicked(bool)),
 			  mc, SLOT(zoomOut()));
 	
@@ -281,7 +307,13 @@ void Citymap::createActions()
 	
 	toolsDistance = new QAction(tr("Calculate Distance"), this);
 	connect(toolsDistance, SIGNAL(triggered(bool)),
-			  this, SLOT(calcDistance()));
+              this, SLOT(calcDistance()));
+
+    toolsLocalDiskCache = new QAction(tr("Cache Tiles Locally"), this);
+    toolsLocalDiskCache->setCheckable(true);
+    toolsLocalDiskCache->setChecked(true);
+    connect(toolsLocalDiskCache, SIGNAL(triggered(bool)),
+              this, SLOT(cacheTiles(bool)));
 	
 	QActionGroup* mapproviderGroup = new QActionGroup(this);
 	osmAction = new QAction(tr("OpenStreetMap"), mapproviderGroup);
@@ -301,6 +333,19 @@ void Citymap::createActions()
 	yahooActionOverlay->setEnabled(false);
 	connect(yahooActionOverlay, SIGNAL(toggled(bool)),
 			  overlay, SLOT(setVisible(bool)));
+
+    QActionGroup* mapZoomGroup = new QActionGroup(this);
+
+    for( int i=0; i <= 17; i++ )
+    {
+        QString title = QString("Zoom %1").arg(i);
+        QAction* action = new QAction(title, mapZoomGroup);
+        action->setCheckable(true);
+        zoomActions << action;
+    }
+    connect(mapZoomGroup, SIGNAL(triggered(QAction*)),
+              this, SLOT(mapZoomSelected(QAction*)));
+
 }
 
 void Citymap::createMenus()
@@ -318,6 +363,7 @@ void Citymap::createMenus()
 	toolsMenu = menuBar()->addMenu(tr("&Tools"));
 	toolsMenu->addAction(addNoteAction);
 	toolsMenu->addAction(toolsDistance);
+    toolsMenu->addAction(toolsLocalDiskCache);
 	
 	mapMenu = menuBar()->addMenu(tr("&Map Provider"));
 	mapMenu->addAction(osmAction);
@@ -327,6 +373,12 @@ void Citymap::createMenus()
 	mapMenu->addSeparator();
 	mapMenu->addAction(yahooActionOverlay);
 	
+    zoomMenu = menuBar()->addMenu(tr("&Zoom Level"));
+    foreach( QAction* action, zoomActions )
+    {
+        zoomMenu->addAction(action);
+    }
+
 }
 
 void Citymap::addNote()
@@ -386,7 +438,16 @@ void Citymap::editNote(Geometry* geom, QPoint)
 	
 	mc->updateRequestNew();
 	connect(mc, SIGNAL(mouseEventCoordinate(const QMouseEvent*, const QPointF)),
-			  this, SLOT(hideNote(const QMouseEvent*, const QPointF)));
+            this, SLOT(hideNote(const QMouseEvent*, const QPointF)));
+}
+
+void Citymap::resizeEvent(QResizeEvent *qEvent)
+{
+    Q_UNUSED( qEvent );
+    if (mc)
+    {
+        mc->resize(size());
+    }
 }
 
 void Citymap::calcDistance()
@@ -415,7 +476,6 @@ void Citymap::calcDistanceClick(const QMouseEvent* evnt, const QPointF coord)
 		
 		double km = acos(cos(a1)*cos(b1)*cos(a2)*cos(b2) + cos(a1)*sin(b1)*cos(a2)*sin(b2) + sin(a1)*sin(a2)) * r;
 		
-		
 		QList<Point*> points;
 		points.append(new Point(coord1.x(), coord1.y()));
 		QPixmap* pixm = new QPixmap(100,20);
@@ -433,7 +493,21 @@ void Citymap::calcDistanceClick(const QMouseEvent* evnt, const QPointF coord)
 		disconnect(mc, SIGNAL(mouseEventCoordinate( const QMouseEvent*, const QPointF)),
 					  this, SLOT(calcDistanceClick(const QMouseEvent*, const QPointF)));
 		
-	}
+    }
+}
+
+void Citymap::mapControlZoomChanged(const QPointF &coordinate, int zoom) const
+{
+    Q_UNUSED(coordinate);
+    if ( zoomActions.at(zoom) )
+    {
+        zoomActions.at(zoom)->setChecked( true );
+    }
+}
+
+void Citymap::mapZoomSelected(QAction* action)
+{
+    mc->setZoom( zoomActions.indexOf(action) );
 }
 
 void Citymap::mapproviderSelected(QAction* action)
@@ -490,13 +564,13 @@ void Citymap::mapproviderSelected(QAction* action)
 		yahooActionOverlay->setEnabled(true);
 	} else if (action == googleActionMap)
 	{
-		int zoom = mapadapter->adaptedZoom();
-		mc->setZoom(0);
+        int zoom = mapadapter->adaptedZoom();
+        mc->setZoom(0);
 		mapadapter = new GoogleMapAdapter();
 		l->setMapAdapter(mapadapter);
 		sights->setMapAdapter(mapadapter);
 		museum->setMapAdapter(mapadapter);
-		pubs->setMapAdapter(mapadapter);
+        pubs->setMapAdapter(mapadapter);
 		notes->setMapAdapter(mapadapter);
 		mc->updateRequestNew();
 		mc->setZoom(zoom);
