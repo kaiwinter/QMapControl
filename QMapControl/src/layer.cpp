@@ -26,6 +26,10 @@
 #include "layer.h"
 namespace qmapcontrol
 {
+    Layer::Layer()
+        :visible(true), mylayertype(MapLayer), mapAdapter(0), takeevents(true), myoffscreenViewport(QRect(0,0,0,0))
+    {
+    }
     Layer::Layer(QString layername, MapAdapter* mapadapter, enum LayerType layertype, bool takeevents)
             :visible(true), mylayername(layername), mylayertype(layertype), mapAdapter(mapadapter), takeevents(takeevents), myoffscreenViewport(QRect(0,0,0,0))
     {
@@ -33,7 +37,8 @@ namespace qmapcontrol
 
     Layer::~Layer()
     {
-        delete mapAdapter;
+        if( mapAdapter )
+            delete mapAdapter;
     }
 
     void Layer::setSize(QSize size)
@@ -71,7 +76,7 @@ namespace qmapcontrol
 
     void Layer::sendGeometryToFront(Geometry *geometry)
     {
-        if ( !geometry || geometries.contains( geometry ) )
+        if ( !geometry || !geometries.contains( geometry ) )
         {
             return;
         }
@@ -82,7 +87,7 @@ namespace qmapcontrol
 
     void Layer::sendGeometryToBack(Geometry *geometry)
     {
-        if ( !geometry || geometries.contains( geometry ) )
+        if ( !geometry || !geometries.contains( geometry ) )
         {
             return;
         }
