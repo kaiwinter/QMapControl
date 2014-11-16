@@ -31,7 +31,6 @@ namespace qmapcontrol
     {
     }
 
-
     Geometry::~Geometry()
     {
     }
@@ -56,10 +55,10 @@ namespace qmapcontrol
     {
         return false;
     }
-    QList<Geometry*> Geometry::clickedPoints()
+
+    QList<Geometry*>& Geometry::clickedPoints()
     {
-        QList<Geometry*> tmp;
-        return tmp;
+        return touchedPoints;
     }
 
     bool Geometry::isVisible() const

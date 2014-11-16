@@ -199,7 +199,7 @@ namespace qmapcontrol
         
         int sum_x = 0;
         int sum_y = 0;
-        for (int i=0; i<coordinates.size(); i++)
+        for (int i=0; i<coordinates.size(); ++i)
         {
             // mitte muss in px umgerechnet werden, da aufgrund der projektion die mittebestimmung aus koordinaten ungenau ist
             QPoint p = layer()->mapadapter()->coordinateToDisplay(coordinates.at(i));
@@ -216,7 +216,7 @@ namespace qmapcontrol
     {
         QRectF bb = getViewport();
         bool containsall = true;
-        for (int i=0; i<coordinates.size(); i++)
+        for (int i=0; i<coordinates.size(); ++i)
         {
             if (!bb.contains(coordinates.at(i)))
                 return false;
@@ -447,14 +447,14 @@ namespace qmapcontrol
 
         if (zoomlevel < current_zoom)
         {
-            for (int i=current_zoom; i>zoomlevel; i--)
+            for (int i=current_zoom; i>zoomlevel; --i)
             {
                 zoomOut();
             }
         }
         else
         {
-            for (int i=current_zoom; i<zoomlevel; i++)
+            for (int i=current_zoom; i<zoomlevel; ++i)
             {
                 zoomIn();
             }

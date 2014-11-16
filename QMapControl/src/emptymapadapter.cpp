@@ -61,6 +61,7 @@ namespace qmapcontrol
     {
         return x * (PI/180.0);
     }
+
     qreal EmptyMapAdapter::rad_deg(qreal x) const
     {
         return x * (180/PI);
@@ -108,15 +109,18 @@ namespace qmapcontrol
         return true;
 
     }
+
     int EmptyMapAdapter::tilesonzoomlevel(int zoomlevel) const
     {
         return int(pow(2.0, zoomlevel));
         return int(pow(2.0, zoomlevel));
     }
+
     int EmptyMapAdapter::xoffset(int x) const
     {
         return x;
     }
+
     int EmptyMapAdapter::yoffset(int y) const
     {
         return y;

@@ -107,9 +107,9 @@ void LinesAndPoints::geometryClicked(Geometry* geom, QPoint)
 	qDebug() << "Element clicked: " << geom->name();
 	if (geom->hasClickedPoints())
 	{
-		QList<Geometry*> pp = geom->clickedPoints();
+        QList<Geometry*> pp = geom->clickedPoints();
 		qDebug() << "number of child elements: " << pp.size();
-		for (int i=0; i<pp.size(); i++)
+        for (int i=0; i<pp.size(); ++i)
 		{
 			QMessageBox::information(this, geom->name(), pp.at(i)->name());
 		}

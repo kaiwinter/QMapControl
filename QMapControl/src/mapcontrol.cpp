@@ -156,7 +156,7 @@ namespace qmapcontrol
         steps--;
         if (steps>0)
         {
-            QTimer::singleShot(40, this, SLOT(tick()));
+            QTimer::singleShot(50, this, SLOT(tick()));
         }
         else
         {
@@ -166,47 +166,42 @@ namespace qmapcontrol
 
     void MapControl::paintEvent(QPaintEvent* evnt)
     {
-        QWidget::paintEvent(evnt);
+        Q_UNUSED(evnt);
 
-        QPainter painter(this);
+        static QPixmap *doubleBuffer = 0;
+        if (!doubleBuffer || doubleBuffer->width() != width() || doubleBuffer->height() != height())
+        {
+           doubleBuffer = new QPixmap(width(), height());
+        }
 
-        // painter.translate(150,190);
-        // painter.scale(0.5,0.5);
+        QPainter dbPainter;
+        dbPainter.begin(doubleBuffer);
 
-        // painter.setClipRect(0,0, size.width(), size.height());
+        layermanager->drawImage(&dbPainter);
+        layermanager->drawGeoms(&dbPainter);
 
-        // painter.setViewport(10000000000,0,size.width(),size.height());
-
-        /*
-        // rotating
-            rotation = 45;
-            painter.translate(256,256);
-            painter.rotate(rotation);
-            painter.translate(-256,-256);
-        */
-
-        layermanager->drawImage(&painter);
-        layermanager->drawGeoms(&painter);
-
-        // added by wolf
         // draw scale
         if (scaleVisible)
         {
-            QList<double> distanceList;
-            distanceList<<5000000<<2000000<<1000000<<1000000<<1000000<<100000<<100000<<50000<<50000<<10000<<10000<<10000<<1000<<1000<<500<<200<<100<<50<<25;
+            static QList<double> distanceList;
+            if (distanceList.isEmpty())
+            {
+                distanceList<<5000000<<2000000<<1000000<<1000000<<1000000<<100000<<100000<<50000<<50000<<10000<<10000<<10000<<1000<<1000<<500<<200<<100<<50<<25;
+            }
+
             if (currentZoom() >= layermanager->minZoom() && distanceList.size() > currentZoom())
             {
                 double line;
                 line = distanceList.at( currentZoom() ) / pow(2.0, 18-currentZoom() ) / 0.597164;
 
                 // draw the scale
-                painter.setPen(Qt::black);
+                dbPainter.setPen(Qt::black);
                 QPoint p1(10,size.height()-20);
                 QPoint p2((int)line,size.height()-20);
-                painter.drawLine(p1,p2);
+                dbPainter.drawLine(p1,p2);
 
-                painter.drawLine(10,size.height()-15, 10,size.height()-25);
-                painter.drawLine((int)line,size.height()-15, (int)line,size.height()-25);
+                dbPainter.drawLine(10,size.height()-15, 10,size.height()-25);
+                dbPainter.drawLine((int)line,size.height()-15, (int)line,size.height()-25);
 
                 QString distance;
                 if (distanceList.at(currentZoom()) >= 1000)
@@ -218,50 +213,35 @@ namespace qmapcontrol
                     distance = QVariant( distanceList.at(currentZoom()) ).toString() + " m";
                 }
 
-                painter.drawText(QPoint((int)line+10,size.height()-15), distance);
+                dbPainter.drawText(QPoint((int)line+10,size.height()-15), distance);
             }
         }
 
         if (crosshairsVisible)
         {
-            painter.drawLine(screen_middle.x(), screen_middle.y()-10,
+            dbPainter.drawLine(screen_middle.x(), screen_middle.y()-10,
                              screen_middle.x(), screen_middle.y()+10); // |
-            painter.drawLine(screen_middle.x()-10, screen_middle.y(),
+            dbPainter.drawLine(screen_middle.x()-10, screen_middle.y(),
                              screen_middle.x()+10, screen_middle.y()); // -
         }
 
-        // int cross_x = int(layermanager->getMapmiddle_px().x())%256;
-        // int cross_y = int(layermanager->getMapmiddle_px().y())%256;
-        // painter.drawLine(screen_middle.x()-cross_x+cross_x, screen_middle.y()-cross_y+0,
-        //   screen_middle.x()-cross_x+cross_x, screen_middle.y()-cross_y+256); // |
-        // painter.drawLine(screen_middle.x()-cross_x+0, screen_middle.y()-cross_y+cross_y,
-        //   screen_middle.x()-cross_x+256, screen_middle.y()-cross_y+cross_y); // -
-
-        painter.drawRect(0,0, size.width(), size.height());
-        /*
-        // rotating
-          painter.setMatrix(painter.matrix().inverted());
-        //qt = painter.transform();
-           qm = painter.combinedMatrix();
-        */
+        dbPainter.drawRect(0,0, size.width(), size.height());
 
         if (mousepressed && mymousemode == Dragging)
         {
             QRect rect = QRect(pre_click_px, current_mouse_pos);
-            painter.drawRect(rect);
+            dbPainter.drawRect(rect);
         }
-
+        dbPainter.end();
+        QPainter painter;
+        painter.begin( this );
+        painter.drawPixmap( rect(), *doubleBuffer, evnt->rect() );
         painter.end();
     }
 
     // mouse events
     void MapControl::mousePressEvent(QMouseEvent* evnt)
     {
-        //rotating (experimental)
-        // QMouseEvent* me = new QMouseEvent(evnt->type(), qm.map(QPoint(evnt->x(),evnt->y())), evnt->button(), evnt->buttons(), evnt->modifiers());
-        // evnt = me;
-        // qDebug() << "evnt: " << evnt->x() << ", " << evnt->y() << ", " << evnt->pos();
-
         layermanager->mouseEvent(evnt);
 
         if (layermanager->layers().size()>0)
@@ -307,13 +287,6 @@ namespace qmapcontrol
 
     void MapControl::mouseMoveEvent(QMouseEvent* evnt)
     {
-        // emit(mouseEvent(evnt));
-
-        /*
-        // rotating
-           QMouseEvent* me = new QMouseEvent(evnt->type(), qm.map(QPoint(evnt->x(),evnt->y())), evnt->button(), evnt->buttons(), evnt->modifiers());
-           evnt = me;
-        */
         if (mousepressed && mymousemode == Panning)
         {
             QPoint offset = pre_click_px - QPoint(evnt->x(), evnt->y());

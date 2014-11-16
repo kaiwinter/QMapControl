@@ -183,8 +183,8 @@ void Multidemo::geometryClickEvent(Geometry* geom, QPoint)
 {
 	if (geom->hasClickedPoints())
 	{
-		QList<Geometry*> pp = geom->clickedPoints();
-		for (int i=0; i<pp.size(); i++)
+        QList<Geometry*> pp = geom->clickedPoints();
+        for (int i=0; i<pp.size(); ++i)
 		{
 			QMessageBox::information(this, geom->name(), pp.at(i)->name());
 		}

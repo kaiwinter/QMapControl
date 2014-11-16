@@ -33,19 +33,25 @@
 
 namespace qmapcontrol
 {
+    const int MapNetwork::kMAX_HTTP_THREADS = 5;
+
     MapNetwork::MapNetwork(ImageManager* parent)
         :   parent(parent), 
-            http(new QNetworkAccessManager(this)), 
             loaded(0), 
-            networkActive( false )
+            networkActive( false ),
+            nextThreadIndex(-1)
     {
-        connect(this->http, SIGNAL(finished(QNetworkReply *)),
-                this, SLOT(requestFinished(QNetworkReply *)));
+        for(int i =0; i <= kMAX_HTTP_THREADS; ++i )
+        {
+            QNetworkAccessManager* http(new QNetworkAccessManager(this));
+            connect(http, SIGNAL(finished(QNetworkReply *)),
+                    this, SLOT(requestFinished(QNetworkReply *)));
+            httpThreads << http;
+        }
     }
 
     MapNetwork::~MapNetwork()
     {
-
         foreach(QNetworkReply *reply, replyList)
         {
             if(reply->isRunning())
@@ -53,8 +59,14 @@ namespace qmapcontrol
                 reply->abort();
             }
             reply->deleteLater();
+            reply = 0;
         }
-        delete http;
+
+        foreach(QNetworkAccessManager *http, httpThreads)
+        {
+            http->deleteLater();
+            http = 0;
+        }
     }
 
     void MapNetwork::loadImage(const QString& host, const QString& url)
@@ -77,8 +89,8 @@ namespace qmapcontrol
         request.setRawHeader("User-Agent", "Mozilla/5.0 (PC; U; Intel; Linux; en) AppleWebKit/420+ (KHTML, like Gecko)");
 
         QMutexLocker lock(&vectorMutex);
-        replyList.append(http->get(request));
-        loadingMap.insert(finalUrl, url );
+        replyList.append( nextFreeHttp()->get(request) );
+        loadingMap.insert( finalUrl, url );
 }
 
     void MapNetwork::requestFinished(QNetworkReply *reply)
@@ -149,6 +161,16 @@ namespace qmapcontrol
         return loadingMap.size();
     }
 
+    QNetworkAccessManager* MapNetwork::nextFreeHttp()
+    {
+        nextThreadIndex++;
+        if ( nextThreadIndex >= httpThreads.size() )
+        {
+            nextThreadIndex = 0;
+        }
+        return httpThreads.value( nextThreadIndex );
+    }
+
     void MapNetwork::abortLoading()
     {
         //qDebug() << "MapNetwork::abortLoading";
@@ -180,12 +202,15 @@ namespace qmapcontrol
 
     void MapNetwork::setProxy(const QString host, const int port, const QString username, const QString password)
     {
-#ifndef Q_WS_QWS
         // do not set proxy on qt/extended
-        QNetworkProxy proxy = QNetworkProxy(QNetworkProxy::HttpProxy, host, port);
-        proxy.setUser(username);
-        proxy.setPassword(password);
-        http->setProxy(proxy);
+#ifndef Q_WS_QWS
+        foreach( QNetworkAccessManager* http, httpThreads )
+        {
+            QNetworkProxy proxy = QNetworkProxy( QNetworkProxy::HttpProxy, host, port );
+            proxy.setUser( username );
+            proxy.setPassword( password );
+            http->setProxy( proxy );
+        }
 #endif
     }
 }
