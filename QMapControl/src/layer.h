@@ -126,13 +126,27 @@ namespace qmapcontrol
          * This method removes all Geometry objects from this Layer.
          * @return a list of geometries that are on this Layer
          */
-        QList<Geometry*> getGeometries();
+        QList<Geometry*>& getGeometries();
 
         //! returns true if Layer contains geometry
         /*!
          * This method returns if a Geometry objects is on this Layer.
          */
         bool containsGeometry( Geometry* geometry );
+
+        //! allow moving a geometry to the top of the list (drawing last)
+        /*!
+         * This method re-order the Geometry objects so the desired
+         * geometry is drawn last and visible above all geometries
+         */
+        void sendGeometryToFront( Geometry* geometry );
+
+        //! allow moving a geometry to the top of the list (drawing last)
+        /*!
+         * This method re-order the Geometry objects so the desired
+         * geometry is drawn first and under all other geometries
+         */
+        void sendGeometryToBack( Geometry* geometry );
 
         //! return true if the layer is visible
         /*!

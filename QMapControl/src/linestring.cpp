@@ -118,37 +118,71 @@ namespace qmapcontrol
 
     bool LineString::Touches(Point* geom, const MapAdapter* mapadapter)
     {
-        // qDebug() << "LineString::Touches Point";
         touchedPoints.clear();
-        bool touches = false;
-        for (int i=0; i<childPoints.count(); i++)
+
+        if (points().size() < 2)
         {
-            // use implementation from Point
-            if (childPoints.at(i)->Touches(geom, mapadapter))
+            // really shouldn't end up here since we always add atleast points to create a line
+            return false;
+        }
+
+        bool touches = false;
+
+        QPointF clickPt = mapadapter->coordinateToDisplay(geom->coordinate());
+
+        qreal halfwidth = 2; // use 2 pixels by default
+        if (mypen && mypen->width() > 0)
+        {
+            halfwidth = static_cast<qreal> (mypen->width())/ static_cast<qreal> (2);
+        }
+
+        QPointF pt1 = mapadapter->coordinateToDisplay(points().at(0)->coordinate());
+        qreal pt1x1 = pt1.x() - halfwidth;
+        qreal pt1x2 = pt1.x() + halfwidth;
+        qreal pt1y1 = pt1.y() - halfwidth;
+        qreal pt1y2 = pt1.y() + halfwidth;
+        for (int i = 1; i < childPoints.size(); ++i)
+        {
+            QPointF pt2 = mapadapter->coordinateToDisplay(childPoints.at(i)->coordinate());
+            qreal pt2x1 = pt2.x() - halfwidth;
+            qreal pt2x2 = pt2.x() + halfwidth;
+            qreal pt2y1 = pt2.y() - halfwidth;
+            qreal pt2y2 = pt2.y() + halfwidth;
+
+            // build lazy bounding box
+            qreal upperLeftX = qMin(pt1x1, qMin(pt1x2, qMin(pt2x1, pt2x2)));
+            qreal upperLeftY = qMin(pt1y1, qMin(pt1y2, qMin(pt2y1, pt2y2)));
+            qreal lowerRightX = qMax(pt1x1, qMax(pt1x2, qMax(pt2x1, pt2x2)));
+            qreal lowerRightY = qMax(pt1y1, qMax(pt1y2, qMax(pt2y1, pt2y2)));
+
+            QRectF bounds(QPointF(upperLeftX, upperLeftY),
+                          QPointF(lowerRightX,lowerRightY));
+
+            if (bounds.contains(clickPt))
             {
                 touchedPoints.append(childPoints.at(i));
-
                 touches = true;
             }
         }
+
         if (touches)
         {
             emit(geometryClicked(this, QPoint(0,0)));
         }
+
         return touches;
     }
 
     bool LineString::Touches(Geometry* /*geom*/, const MapAdapter* /*mapadapter*/)
     {
-        // qDebug() << "LineString::Touches Geom";
         touchedPoints.clear();
 
         return false;
     }
 
-    QList<Geometry*> LineString::clickedPoints()
+    QList<Geometry*>& LineString::clickedPoints()
     {
-        return touchedPoints;
+        return Geometry::clickedPoints();
     }
 
     bool LineString::hasPoints() const
@@ -167,7 +201,7 @@ namespace qmapcontrol
         qreal maxlon=-180;
         qreal minlat=90;
         qreal maxlat=-90;
-        for (int i=0; i<childPoints.size(); i++)
+        for (int i=0; i<childPoints.size(); ++i)
         {
             Point* tmp = childPoints.at(i);
             if (tmp->longitude() < minlon) minlon = tmp->longitude();
@@ -181,6 +215,5 @@ namespace qmapcontrol
         QSizeF si = QSizeF(dist.x(), dist.y());
 
         return QRectF(min, si);
-
     }
 }

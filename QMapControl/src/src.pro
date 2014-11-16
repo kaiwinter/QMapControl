@@ -5,7 +5,7 @@ QT += gui
 greaterThan(QT_MAJOR_VERSION, 4): QT += widgets
 greaterThan(QT_MAJOR_VERSION, 4): cache()
 
-VERSION = 0.9.7.3
+VERSION = 0.9.7.4
 
 DEFINES += QMAPCONTROL_LIBRARY
 
@@ -37,7 +37,9 @@ HEADERS += curve.h \
            fixedimageoverlay.h \
            emptymapadapter.h \
            arrowpoint.h \
+           invisiblepoint.h \
            qmapcontrol_global.h
+
 SOURCES += curve.cpp \
            geometry.cpp \
            imagemanager.cpp \
@@ -61,4 +63,5 @@ SOURCES += curve.cpp \
            openaerialmapadapter.cpp \
            fixedimageoverlay.cpp \
            arrowpoint.cpp \
+           invisiblepoint.cpp \
            emptymapadapter.cpp

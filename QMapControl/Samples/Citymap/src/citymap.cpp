@@ -336,7 +336,7 @@ void Citymap::createActions()
 
     QActionGroup* mapZoomGroup = new QActionGroup(this);
 
-    for( int i=0; i <= 17; i++ )
+    for( int i=0; i <= 17; ++i )
     {
         QString title = QString("Zoom %1").arg(i);
         QAction* action = new QAction(title, mapZoomGroup);
@@ -345,7 +345,6 @@ void Citymap::createActions()
     }
     connect(mapZoomGroup, SIGNAL(triggered(QAction*)),
               this, SLOT(mapZoomSelected(QAction*)));
-
 }
 
 void Citymap::createMenus()

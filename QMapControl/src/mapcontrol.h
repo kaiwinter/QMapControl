@@ -324,8 +324,8 @@ namespace qmapcontrol
         int steps; // used for method moveTo()
 
         QPointF clickToWorldCoordinate ( QPoint click );
-        MapControl& operator= ( const MapControl& rhs );
-        MapControl ( const MapControl& old );
+
+        Q_DISABLE_COPY( MapControl )
 
     protected:
         void paintEvent ( QPaintEvent* evnt );
@@ -414,11 +414,12 @@ namespace qmapcontrol
          * @param newSize The new size
          */
         void resize(const QSize newSize);
-        
+
     private slots:
         void tick();
         void loadingFinished();
         void positionChanged ( Geometry* geom );
+
     };
 }
 #endif

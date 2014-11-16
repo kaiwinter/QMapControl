@@ -44,14 +44,10 @@ namespace qmapcontrol
         emptyPixmap.fill(Qt::transparent);
         
         //initialize loading image
-        loadingPixmap.fill( Qt::white );
+        loadingPixmap.fill( Qt::transparent );
         QPainter paint(&loadingPixmap);
         QBrush brush( Qt::lightGray, Qt::Dense5Pattern );
         paint.fillRect(loadingPixmap.rect(), brush );
-        
-        brush.setColor( Qt::black );
-        paint.drawText( 10, 10, "LOADING..." );
-
         paint.end();
 
         if (QPixmapCache::cacheLimit() <= kDefaultPixmapCacheSizeKB)
@@ -78,7 +74,7 @@ namespace qmapcontrol
         {
             //currently loading an image
             //return loadingPixmap;
-            return emptyPixmap;
+            return loadingPixmap;
         }
         else if ( QPixmapCache::find( md5hex(url), &pm) )
         {

@@ -107,7 +107,7 @@ namespace qmapcontrol
          * It is possible (depending on the zoomfactor) to click more than one Point of a LineString, so this method returns a list.
          * @return the clicked Points of the LineString
          */
-        virtual QList<Geometry*> clickedPoints();
+        virtual QList<Geometry*> & clickedPoints();
 
     protected:
         virtual bool Touches ( Geometry* geom, const MapAdapter* mapadapter );
@@ -122,7 +122,6 @@ namespace qmapcontrol
         void removePoints();
 
         QList<Point*>	childPoints;
-        QList<Geometry*> 	touchedPoints;
     };
 }
 #endif

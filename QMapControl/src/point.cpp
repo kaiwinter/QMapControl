@@ -123,8 +123,22 @@ namespace qmapcontrol
 
     QRectF Point::boundingBox()
     {
-        //TODO: have to be calculated in relation to alignment...
-        return QRectF(QPointF(X, Y), displaysize);
+        qreal minlon=180;
+        qreal maxlon=-180;
+        qreal minlat=90;
+        qreal maxlat=-90;
+
+        if (longitude() < minlon) minlon = longitude();
+        if (longitude() > maxlon) maxlon = longitude();
+        if (latitude() < minlat) minlat = latitude();
+        if (latitude() > maxlat) maxlat = latitude();
+
+        QPointF min = QPointF(minlon, minlat);
+        QPointF max = QPointF(maxlon, maxlat);
+        QPointF dist = max - min;
+        QSizeF si = QSizeF(dist.x(), dist.y());
+
+        return QRectF(min, si);
     }
 
     qreal Point::longitude() const
@@ -246,79 +260,52 @@ namespace qmapcontrol
         return alignedtopleft;
     }
 
-    bool Point::Touches(Point* p, const MapAdapter* mapadapter)
+    bool Point::Touches(Point* click, const MapAdapter* mapadapter)
     {
         if (this->isVisible() == false)
             return false;
 
-        QPointF c = p->coordinate();
-        // coordinate to pixel
-        QPoint pxOfPoint = mapadapter->coordinateToDisplay(c);
-        // size/2 Pixel toleranz aufaddieren
-        QPoint p1;
-        QPoint p2;
+        if ( !click || !mapadapter )
+            return false;
 
-        switch (myalignment)
+        if (points().size() < 1)
         {
-            case Middle:
-            {
-                p1 = pxOfPoint - QPoint(displaysize.width()/2,displaysize.height()/2);
-                p2 = pxOfPoint + QPoint(displaysize.width()/2,displaysize.height()/2);
-                break;
-            }
-            case TopLeft:
-            {
-                p1 = pxOfPoint - QPoint(displaysize.width(),displaysize.height());
-                p2 = pxOfPoint;
-                break;
-            }
-            case TopRight:
-            {
-                p1 = pxOfPoint - QPoint(0, displaysize.height());
-                p2 = pxOfPoint + QPoint(displaysize.width(),0);
-                break;
-            }
-            case BottomLeft:
-            {
-                p1 = pxOfPoint - QPoint(displaysize.width(), 0);
-                p2 = pxOfPoint + QPoint(0, displaysize.height());
-                break;
-            }
-            case BottomRight:
-            {
-                p1 = pxOfPoint;
-                p2 = pxOfPoint + QPoint(displaysize.width(), displaysize.height());
-                break;
-            }
-            case TopMiddle:
-            {
-                p1 = pxOfPoint - QPoint(displaysize.width(),displaysize.height());
-                p2 = pxOfPoint + QPoint(displaysize.width()/2,displaysize.height()/2);
-                break;
-            }
-            case BottomMiddle:
-            {
-                p1 = pxOfPoint - QPoint(displaysize.width()/2,displaysize.height()/2);
-                p2 = pxOfPoint + QPoint(displaysize.width(), displaysize.height());
-                break;
-            }
-            default:
-                break;
+            return false;
         }
 
-        // calculate "Bounding Box" in coordinates
-        QPointF c1 = mapadapter->displayToCoordinate(p1);
-        QPointF c2 = mapadapter->displayToCoordinate(p2);
-
-
-        if(this->longitude()>=c1.x() && this->longitude()<=c2.x())
+        QPointF clickPt = mapadapter->coordinateToDisplay(click->coordinate());
+        qreal halfwidth = 2; // use 2 pixels by default
+        if (mypixmap.width() > 0)
         {
-            if (this->latitude()<=c1.y() && this->latitude()>=c2.y())
-            {
-                emit(geometryClicked(this, QPoint(0,0)));
-                return true;
-            }
+            halfwidth = static_cast<qreal> (mypixmap.width()) / static_cast<qreal> (2);
         }
+
+        QPointF pt1 = mapadapter->coordinateToDisplay(coordinate());
+        qreal pt1x1 = pt1.x() - halfwidth;
+        qreal pt1x2 = pt1.x() + halfwidth;
+        qreal pt1y1 = pt1.y() - halfwidth;
+        qreal pt1y2 = pt1.y() + halfwidth;
+
+        QPointF pt2 = mapadapter->coordinateToDisplay(coordinate());
+        qreal pt2x1 = pt2.x() - halfwidth;
+        qreal pt2x2 = pt2.x() + halfwidth;
+        qreal pt2y1 = pt2.y() - halfwidth;
+        qreal pt2y2 = pt2.y() + halfwidth;
+
+        // build lazy bounding box
+        qreal upperLeftX = qMin(pt1x1, qMin(pt1x2, qMin(pt2x1, pt2x2)));
+        qreal upperLeftY = qMin(pt1y1, qMin(pt1y2, qMin(pt2y1, pt2y2)));
+        qreal lowerRightX = qMax(pt1x1, qMax(pt1x2, qMax(pt2x1, pt2x2)));
+        qreal lowerRightY = qMax(pt1y1, qMax(pt1y2, qMax(pt2y1, pt2y2)));
+        QRectF bounds(QPointF(upperLeftX, upperLeftY), QPointF(lowerRightX,
+               lowerRightY));
+
+        if ( bounds.contains(clickPt) )
+        {
+            emit(geometryClicked(this, QPoint(0, 0)));
+            return true;
+        }
+
         return false;
     }
 

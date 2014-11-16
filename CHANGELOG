@@ -1,3 +1,14 @@
+0.9.7.4 (2014-11-16)
+=====
+- IMPROVED: corrected double buffering logic when painting layers
+- IMPROVED: Multiple http threads for downloading tiles to improve downloading of tile requests
+- ADDED (Feature #08): New class InvisiblePoint (thanks to Frederic Bourgeois)
+- ADDED (Feature #07): Ability to change Geometry draw order inside a layer
+	- added sendGeometryToFront(), sendGeometryToBack()
+	- getGeometries(), clickedPoints() now return a reference (instead of copy)
+- IMPROVED(Feature #05): Performance optimizations for mouse clicks (thanks to Jon Schewe)
+- UPDATED: Doxygen documentation was outdated, updated for 0.9.7.4
+
 0.9.7.3 (2014-10-15)
 =====
 - FIXED (BUG #17): Google Map Adapter locks zoom when fully zoomed out

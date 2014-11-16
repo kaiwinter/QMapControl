@@ -74,16 +74,25 @@ namespace qmapcontrol
         */
         int loadQueueSize() const;
 
+        /*!
+        *
+        * @return next free http downloader thread
+        */
+        QNetworkAccessManager* nextFreeHttp();
+
     private:
         Q_DISABLE_COPY (MapNetwork)
 
         ImageManager* parent;
-        QNetworkAccessManager* http;
+        QList<QNetworkAccessManager*> httpThreads;
         QList<QNetworkReply*> replyList;
         QMap<QString, QString> loadingMap;
         qreal loaded;
         mutable QMutex vectorMutex;
         bool    networkActive;
+        int     nextThreadIndex;
+
+        static const int kMAX_HTTP_THREADS;
 
     private slots:
         void requestFinished(QNetworkReply *reply);

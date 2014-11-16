@@ -113,13 +113,14 @@ namespace qmapcontrol
         virtual bool hasPoints() const;
         virtual bool hasClickedPoints() const;
         virtual void setPen(QPen* pen);
-        virtual QList<Geometry*> clickedPoints();
+        virtual QList<Geometry*>& clickedPoints();
         virtual QList<Point*> points()=0;
 
     private:
+        Q_DISABLE_COPY( Geometry )
+
         Geometry* myparentGeometry;
-        Geometry(const Geometry& old);
-        Geometry& operator=(const Geometry& rhs);
+        QList<Geometry*> 	touchedPoints;
 
     protected:
         QPen* mypen;
