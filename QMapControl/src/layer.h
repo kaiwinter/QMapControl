@@ -71,6 +71,12 @@ namespace qmapcontrol
             GeometryLayer /*!< gets refreshed everytime when a geometry changes */
         };
 
+        //! Layer default constructor
+        /*!
+         * This is used to construct a layer.
+         */
+        Layer();
+		
         //! Layer constructor
         /*!
          * This is used to construct a layer.
@@ -81,6 +87,7 @@ namespace qmapcontrol
          * @param takeevents Should the Layer receive MouseEvents? This is set to true by default. Setting it to false could
          * be something like a "speed up hint"
          */
+
         Layer(QString layername, MapAdapter* mapadapter, enum LayerType layertype, bool takeevents=true);
         virtual ~Layer();
 
