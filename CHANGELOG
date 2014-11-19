@@ -1,6 +1,6 @@
 0.9.7.5 (2014-11-20)
 =====
-- FIXED: Various static anaysis (cppcheck) suggestions
+- FIXED: Various static analysis (cppcheck) suggestions
 - FIXED (BUG #19): Layer::sendGeometryToFront() - missing exclamation (!)
 - FIXED (BUG #18): Missing logic in LineString::Touches()
 
