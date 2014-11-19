@@ -218,7 +218,7 @@ namespace qmapcontrol
          * @param mapadapter the mapadapter which is used for calculations
          * @return
          */
-        virtual bool Touches(Point* click, const MapAdapter* mapadapter);
+        virtual bool Touches(Point* p, const MapAdapter* mapadapter);
 
     public slots:
         void setCoordinate(QPointF point);

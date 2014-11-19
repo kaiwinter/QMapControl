@@ -163,6 +163,11 @@ namespace qmapcontrol
                 touchedPoints.append(childPoints.at(i));
                 touches = true;
             }
+
+            pt1x1 = pt2x1;
+            pt1x2 = pt2x2;
+            pt1y1 = pt2y1;
+            pt1y2 = pt2y2;
         }
 
         if (touches)

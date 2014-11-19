@@ -99,20 +99,17 @@ namespace qmapcontrol
             z= mMin_zoom - z;
         }
 
+        bool result = true;
         if (x<0 || x>pow(2.0,z)-1 ||
             y<0 || y>pow(2.0,z)-1)
-            if (x<0 || x>pow(2.0,z)-1 ||
-                y<0 || y>pow(2.0,z)-1)
-            {
-            return false;
+        {
+            result = false;
         }
-        return true;
-
+        return result;
     }
 
     int EmptyMapAdapter::tilesonzoomlevel(int zoomlevel) const
     {
-        return int(pow(2.0, zoomlevel));
         return int(pow(2.0, zoomlevel));
     }
 

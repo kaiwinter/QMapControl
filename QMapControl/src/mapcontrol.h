@@ -219,8 +219,6 @@ namespace qmapcontrol
          */
         MapControl::MouseMode mouseMode();
 
-        //int rotation;
-
         //! Enable persistent caching of map tiles
         /*!
          * Call this method to allow the QMapControl widget to save map tiles
@@ -303,6 +301,7 @@ namespace qmapcontrol
         int loadingQueueSize();
 
     private:
+        void __init();
         LayerManager* layermanager;
         QPoint screen_middle; // middle of the widget (half size)
 
