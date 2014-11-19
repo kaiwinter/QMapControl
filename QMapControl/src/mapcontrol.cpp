@@ -30,8 +30,13 @@ namespace qmapcontrol
 {
 
     MapControl::MapControl (QWidget * parent, Qt::WindowFlags windowFlags)
+        :   QWidget( parent, windowFlags ),
+            size(100,100),
+            mymousemode(Panning),
+            scaleVisible(false),
+            crosshairsVisible(true)
     {
-        MapControl( QSize(100,100), Panning, false, true, parent, windowFlags);
+        __init();
     }
 
     MapControl::MapControl(QSize size, MouseMode mousemode, bool showScale, bool showCrosshairs, QWidget * parent, Qt::WindowFlags windowFlags)
@@ -40,6 +45,19 @@ namespace qmapcontrol
             mymousemode(mousemode),
             scaleVisible(showScale),
             crosshairsVisible(showCrosshairs)
+    {
+        __init();
+    }
+
+    MapControl::~MapControl()
+    {
+        if ( layermanager )
+        {
+            delete layermanager;
+        }
+    }
+
+    void MapControl::__init()
     {
         layermanager = new LayerManager(this, size);
         screen_middle = QPoint(size.width()/2, size.height()/2);
@@ -54,11 +72,6 @@ namespace qmapcontrol
 
         this->setMaximumSize(size.width()+1, size.height()+1);
         mouse_wheel_events = true;
-    }
-
-    MapControl::~MapControl()
-    {
-        delete layermanager;
     }
 
     void MapControl::enableMouseWheelEvents( bool enabled )
@@ -113,14 +126,15 @@ namespace qmapcontrol
             return;
         }
 
-        QPoint start = layermanager->layer()->mapadapter()->coordinateToDisplay(currentCoordinate());
-        QPoint dest = layermanager->layer()->mapadapter()->coordinateToDisplay(((Point*)geom)->coordinate());
-
-        QPoint step = (dest-start);
-
-        layermanager->scrollView(step);
-
-        updateRequestNew();
+        Point* point = dynamic_cast<Point*>(geom);
+        if (point!=0)
+        {
+            QPoint start = layermanager->layer()->mapadapter()->coordinateToDisplay(currentCoordinate());
+            QPoint dest = layermanager->layer()->mapadapter()->coordinateToDisplay(point->coordinate());
+            QPoint step = (dest-start);
+            layermanager->scrollView(step);
+            updateRequestNew();
+        }
     }
 
     void MapControl::moveTo(QPointF coordinate)
@@ -556,4 +570,5 @@ namespace qmapcontrol
    {
        return ImageManager::instance()->loadQueueSize();
    }
+
 }

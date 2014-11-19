@@ -1,6 +1,12 @@
+0.9.7.5 (2014-11-20)
+=====
+- FIXED: Various static anaysis (cppcheck) suggestions
+- FIXED (BUG #19): Layer::sendGeometryToFront() - missing exclamation (!)
+- FIXED (BUG #18): Missing logic in LineString::Touches()
+
 0.9.7.4 (2014-11-16)
 =====
-- IMPROVED: corrected double buffering logic when painting layers
+- IMPROVED: Corrected double buffering logic when painting layers
 - IMPROVED: Multiple http threads for downloading tiles to improve downloading of tile requests
 - ADDED (Feature #08): New class InvisiblePoint (thanks to Frederic Bourgeois)
 - ADDED (Feature #07): Ability to change Geometry draw order inside a layer

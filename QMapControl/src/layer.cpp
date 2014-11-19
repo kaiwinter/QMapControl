@@ -343,10 +343,11 @@ namespace qmapcontrol
         {
             if (geometry->GeometryType == "Point")
             {
-                if (((Point*)geometry)->widget()!=0)
+                Point* point = dynamic_cast<Point*>(geometry);
+                if (point !=0)
                 {
                     QPoint topleft_relative = QPoint(mapmiddle_px-screenmiddle);
-                    ((Point*)geometry)->drawWidget(mapAdapter, topleft_relative);
+                    point->drawWidget(mapAdapter, topleft_relative);
                 }
             }
         }
