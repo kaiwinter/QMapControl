@@ -1,3 +1,7 @@
+0.9.7.6 (2014-11-21)
+=====
+- FIXED (BUG #20): Crash in moveWidgets() when panning map with points
+
 0.9.7.5 (2014-11-20)
 =====
 - FIXED: Various static analysis (cppcheck) suggestions
