@@ -237,7 +237,12 @@ void Multidemo::keyPressEvent(QKeyEvent* evnt)
 	else if (evnt->key() == 48 || evnt->key() == 17825797) // 0
 	{
 		emit(close());
-	}
+    }
+}
+
+void Multidemo::resizeEvent(QResizeEvent *event)
+{
+    mc->resize(event->size());
 }
 
 void Multidemo::buttonToggled(bool active)

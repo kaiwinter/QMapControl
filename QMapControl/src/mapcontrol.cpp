@@ -185,7 +185,7 @@ namespace qmapcontrol
         static QPixmap *doubleBuffer = 0;
         if (!doubleBuffer || doubleBuffer->width() != width() || doubleBuffer->height() != height())
         {
-           doubleBuffer = new QPixmap(width(), height());
+            doubleBuffer = new QPixmap(width(), height());
         }
 
         QPainter dbPainter;
@@ -249,7 +249,7 @@ namespace qmapcontrol
         dbPainter.end();
         QPainter painter;
         painter.begin( this );
-        painter.drawPixmap( rect(), *doubleBuffer, evnt->rect() );
+        painter.drawPixmap( rect(), *doubleBuffer, doubleBuffer->rect() );
         painter.end();
     }
 

@@ -47,6 +47,7 @@ class Multidemo : public QWidget
 
         protected:
                 void keyPressEvent(QKeyEvent* evnt);
+                virtual void resizeEvent ( QResizeEvent * event );
 
         signals:
                 void setX(int);

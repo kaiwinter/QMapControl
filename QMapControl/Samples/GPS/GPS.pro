@@ -13,6 +13,8 @@ greaterThan(QT_MAJOR_VERSION, 4): cache()
 # Input
 SOURCES += src/gps.cpp \
 src/main.cpp \
-src/gps_neo.cpp
+src/gps_neo.cpp \
+    src/gps_simulation.cpp
 HEADERS += src/gps.h \
-src/gps_neo.h
+src/gps_neo.h \
+    src/gps_simulation.h

@@ -73,10 +73,8 @@ LinesAndPoints::LinesAndPoints(QWidget *parent)
 			  this, SLOT(geometryClicked(Geometry*, QPoint)));
 	
 	// Sets the view to the interesting area
-	QList<QPointF> view;
-	view.append(QPointF(8.24764, 50.0319));
-	view.append(QPointF(8.28412, 49.9998));
-	mc->setView(view);
+    mc->setView(QPointF(8.259959, 50.001781));
+    mc->setZoom(11);
 	
 	addZoomButtons();
 }
@@ -122,6 +120,15 @@ void LinesAndPoints::geometryClicked(Geometry* geom, QPoint)
 
 LinesAndPoints::~LinesAndPoints()
 {
+}
+
+void LinesAndPoints::resizeEvent(QResizeEvent *qEvent)
+{
+    Q_UNUSED( qEvent );
+    if (mc)
+    {
+        mc->resize(size());
+    }
 }
 
 void LinesAndPoints::keyPressEvent(QKeyEvent* evnt)

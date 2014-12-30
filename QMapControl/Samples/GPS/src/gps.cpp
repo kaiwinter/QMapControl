@@ -25,46 +25,65 @@ GPS::GPS()
 	
 	// create MapAdapter to get maps from
 	TileMapAdapter* mapadapter = new TileMapAdapter("tile.openstreetmap.org", "/%1/%2/%3.png", 256, 0, 17);
-	
+
 	// create a layer with the mapadapter and type MapLayer
 	Layer* l = new Layer("Custom Layer", mapadapter, Layer::MapLayer);
-	
+
+    //current GPS Location
+    gpsDot = new CirclePoint(0,0, "GPS", CirclePoint::Middle, new QPen( Qt::darkBlue ));
+    l->addGeometry( gpsDot );
+
 	// add Layer to the MapControl
 	mc->addLayer(l);
-	
+
 	// display the MapControl in the application
 	QHBoxLayout* layout = new QHBoxLayout;
 	layout->addWidget(mc);
 	setLayout(layout);
-	
+
 	// create buttons as controls for zoom
 	QPushButton* zoomin = new QPushButton("+");
 	QPushButton* zoomout = new QPushButton("-");
-	followgps = new QPushButton("F");
-	followgps->setCheckable(true);
-	gpsposition = new QLabel();
+
+    followgps = new QPushButton("Follow");
+    followgps->setCheckable(true);
+    simulategps = new QPushButton("Simulate");
+    simulategps->setCheckable(true);
+    gpsposition = new QLabel();
 	zoomin->setMaximumWidth(50);
 	zoomout->setMaximumWidth(50);
 	followgps->setMaximumWidth(50);
+    simulategps->setMaximumWidth(50);
 	gpsposition->setFont(QFont("Arial", 10));
 	
 	connect(zoomin, SIGNAL(clicked(bool)),
 			  mc, SLOT(zoomIn()));
 	connect(zoomout, SIGNAL(clicked(bool)),
 			  mc, SLOT(zoomOut()));
+
+    connect(simulategps, SIGNAL(clicked(bool)),
+              this, SLOT(simulategps_checked()));
 	
 	// add zoom buttons to the layout of the MapControl
 	QVBoxLayout* innerlayout = new QVBoxLayout;
 	innerlayout->addWidget(zoomin);
 	innerlayout->addWidget(zoomout);
 	innerlayout->addWidget(followgps);
+    innerlayout->addWidget(simulategps);
 	innerlayout->addWidget(gpsposition);
 	mc->setLayout(innerlayout);
 	
 	GPS_Neo* gm = new GPS_Neo();
 	connect(gm, SIGNAL(new_position(float, QPointF)),
 			  this, SLOT(updatePosition(float, QPointF)));
-	gm->start();
+
+    gpsSim = new GPS_Simulation(this);
+    connect(gpsSim, SIGNAL(newPosition(float,QPointF)),
+                        this, SLOT(updatePosition(float, QPointF)));
+
+    mc->setView(QPointF(0, 0));
+
+    gm->start();
 }
 
 GPS::~GPS()
@@ -78,4 +97,29 @@ void GPS::updatePosition(float time, QPointF coordinate)
 	{
 		mc->setView(coordinate);
 	}
+
+    //update the gps dot location on map
+    gpsDot->setCoordinate(coordinate);
 }
+
+void GPS::resizeEvent(QResizeEvent *qEvent)
+{
+    Q_UNUSED( qEvent );
+    if (mc)
+    {
+        mc->resize(size());
+    }
+}
+
+void GPS::simulategps_checked()
+{
+    if ( simulategps->isChecked() )
+    {
+        gpsSim->start();
+    }
+    else
+    {
+        gpsSim->stop();
+    }
+}
+
