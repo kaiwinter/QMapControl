@@ -31,6 +31,8 @@ Mapviewer::Mapviewer(QWidget *parent)
 
     addZoomButtons();
 
+    mc->setView(QPointF(0,0));
+    mc->setZoom(2);
     // show mapcontrol in mainwindow
     setCentralWidget(mc);
 }

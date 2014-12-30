@@ -10,20 +10,21 @@
 using namespace qmapcontrol;
 class LinesAndPoints : public QWidget
 {
-        Q_OBJECT
-        public:
-                LinesAndPoints(QWidget *parent = 0);
-                ~LinesAndPoints();
+    Q_OBJECT
+    public:
+            LinesAndPoints(QWidget *parent = 0);
+            ~LinesAndPoints();
 
-        private:
-                MapControl* mc;
-                void addZoomButtons();
+    private:
+            MapControl* mc;
+            void addZoomButtons();
 
-        public slots:
-                void geometryClicked(Geometry* geom, QPoint coord_px);
+    public slots:
+            void geometryClicked(Geometry* geom, QPoint coord_px);
+            void resizeEvent(QResizeEvent *qEvent);
 
-        protected:
-                void keyPressEvent(QKeyEvent* evnt);
+    protected:
+            void keyPressEvent(QKeyEvent* evnt);
 };
 
 #endif
