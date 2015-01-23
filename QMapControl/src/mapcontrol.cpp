@@ -182,9 +182,12 @@ namespace qmapcontrol
     {
         Q_UNUSED(evnt);
 
-        static QPixmap *doubleBuffer = 0;
-        if (!doubleBuffer || doubleBuffer->width() != width() || doubleBuffer->height() != height())
+        static QPixmap *doubleBuffer( new QPixmap(width(), height()) );
+
+        //check for resize change
+        if ( doubleBuffer->width() != width() || doubleBuffer->height() != height() )
         {
+            delete doubleBuffer;
             doubleBuffer = new QPixmap(width(), height());
         }
 
@@ -490,9 +493,9 @@ namespace qmapcontrol
         disconnect(geom,SIGNAL(positionChanged(Geometry*)), this, SLOT(positionChanged(Geometry*)));
     }
 
-    void MapControl::enablePersistentCache( int tileExpiry, const QDir& path)
+    void MapControl::enablePersistentCache( const QDir& path, const int qDiskSizeMB )
     {
-        ImageManager::instance()->setCacheDir(tileExpiry, path);
+        ImageManager::instance()->setCacheDir( path, qDiskSizeMB );
     }
 
     void MapControl::setProxy(QString host, int port, const QString username, const QString password)
@@ -516,7 +519,7 @@ namespace qmapcontrol
         screen_middle = QPoint(newSize.width()/2, newSize.height()/2);
 
         this->setMaximumSize(newSize.width()+1, newSize.height()+1);
-        layermanager->resize(newSize);
+        layermanager->resize(newSize);      
 
         emit viewChanged(currentCoordinate(), currentZoom());
     }

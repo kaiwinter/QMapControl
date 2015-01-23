@@ -27,7 +27,6 @@ Citymap::Citymap(QWidget*)
 	// create MapControl
 	mc = new MapControl(QSize(380,540));
     mc->showScale(true);
-    mc->enablePersistentCache(); //5 min expiry
 	// display the MapControl in the application
 	QVBoxLayout* layout = new QVBoxLayout;
 	layout->addWidget(mc);
@@ -42,15 +41,11 @@ Citymap::Citymap(QWidget*)
 	coord1 = QPointF();
 	coord2 = QPointF();
 	mapadapter = new OSMMapAdapter();
-	MapAdapter* mapadapter_overlay = new YahooMapAdapter("us.maps3.yimg.com", "/aerial.maps.yimg.com/png?v=2.2&t=h&s=256&x=%2&y=%3&z=%1");
 
 	// create a layer with the mapadapter and type MapLayer
 	l = new MapLayer("Custom Layer", mapadapter);
-	overlay = new MapLayer("Overlay", mapadapter_overlay);
-	overlay->setVisible(false);
 
 	mc->addLayer(l);
-	mc->addLayer(overlay);
 		
 	notes = new GeometryLayer("Notes", mapadapter);
 
@@ -68,7 +63,6 @@ Citymap::Citymap(QWidget*)
 	mc->addLayer(notes);
 	connect(notes, SIGNAL(geometryClicked(Geometry*, QPoint)),
 			  this, SLOT(editNote(Geometry*, QPoint)));
-
 	
 	mc->setView(QPointF(8.26,50));
 	mc->setZoom(13);
@@ -91,6 +85,8 @@ Citymap::Citymap(QWidget*)
     loadingProgressTimer = new QTimer(this);
     connect(loadingProgressTimer, SIGNAL(timeout()), this, SLOT(updateProgress()), Qt::QueuedConnection );
     loadingProgressTimer->start( 500 ); //update every 500ms
+
+    cacheTiles(true);
 }
 
 void Citymap::updateProgress()
@@ -102,8 +98,14 @@ void Citymap::updateProgress()
 
 void Citymap::cacheTiles(bool qEnabled)
 {
-    //cache will be set at 1hr (60min) if enabled
-    mc->enablePersistentCache( qEnabled ? 60 : -1 );
+    if (qEnabled)
+    {
+        mc->enablePersistentCache();
+    }
+    else
+    {
+        mc->enablePersistentCache(QDir());
+    }
 }
 
 void Citymap::createTours()
@@ -316,24 +318,16 @@ void Citymap::createActions()
               this, SLOT(cacheTiles(bool)));
 	
 	QActionGroup* mapproviderGroup = new QActionGroup(this);
-	osmAction = new QAction(tr("OpenStreetMap"), mapproviderGroup);
-	yahooActionMap = new QAction(tr("Yahoo: Map"), mapproviderGroup);
-	yahooActionSatellite = new QAction(tr("Yahoo: Satellite"), mapproviderGroup);
-	googleActionMap = new QAction(tr("Google: Map"), mapproviderGroup);
+    osmAction = new QAction(tr("OpenStreetMap"), mapproviderGroup);
+    googleActionMap = new QAction(tr("Google: Map"), mapproviderGroup);
+    googleActionSatellite = new QAction(tr("Google: Satellite"), mapproviderGroup);
 	osmAction->setCheckable(true);
-	yahooActionMap->setCheckable(true);
-	yahooActionSatellite->setCheckable(true);
 	googleActionMap->setCheckable(true);
+    googleActionSatellite->setCheckable(true);
 	osmAction->setChecked(true);
 	connect(mapproviderGroup, SIGNAL(triggered(QAction*)),
 			  this, SLOT(mapproviderSelected(QAction*)));
-	
-	yahooActionOverlay = new QAction(tr("Yahoo: street overlay"), this);
-	yahooActionOverlay->setCheckable(true);
-	yahooActionOverlay->setEnabled(false);
-	connect(yahooActionOverlay, SIGNAL(toggled(bool)),
-			  overlay, SLOT(setVisible(bool)));
-
+		
     QActionGroup* mapZoomGroup = new QActionGroup(this);
 
     for( int i=0; i <= 17; ++i )
@@ -366,11 +360,8 @@ void Citymap::createMenus()
 	
 	mapMenu = menuBar()->addMenu(tr("&Map Provider"));
 	mapMenu->addAction(osmAction);
-	mapMenu->addAction(yahooActionMap);
-	mapMenu->addAction(yahooActionSatellite);
 	mapMenu->addAction(googleActionMap);
-	mapMenu->addSeparator();
-	mapMenu->addAction(yahooActionOverlay);
+    mapMenu->addAction(googleActionSatellite);
 	
     zoomMenu = menuBar()->addMenu(tr("&Zoom Level"));
     foreach( QAction* action, zoomActions )
@@ -522,46 +513,10 @@ void Citymap::mapproviderSelected(QAction* action)
 		museum->setMapAdapter(mapadapter);
 		pubs->setMapAdapter(mapadapter);
 		notes->setMapAdapter(mapadapter);
-		
 		mc->updateRequestNew();
 		mc->setZoom(zoom);
-		yahooActionOverlay->setEnabled(false);
-		overlay->setVisible(false);
-		yahooActionOverlay->setChecked(false);
-		
-	} else if (action == yahooActionMap)
-	{
-		int zoom = mapadapter->adaptedZoom();
-		mc->setZoom(0);
-		
-		mapadapter = new YahooMapAdapter();
-		l->setMapAdapter(mapadapter);
-		sights->setMapAdapter(mapadapter);
-		museum->setMapAdapter(mapadapter);
-		pubs->setMapAdapter(mapadapter);
-		notes->setMapAdapter(mapadapter);
-	
-		mc->updateRequestNew();
-		mc->setZoom(zoom);
-		yahooActionOverlay->setEnabled(false);
-		overlay->setVisible(false);
-		yahooActionOverlay->setChecked(false);
-	} else if (action == yahooActionSatellite)
-	{
-        int zoom = mapadapter->adaptedZoom();
-		mc->setZoom(0);
-		
-		mapadapter = new YahooMapAdapter("us.maps3.yimg.com", "/aerial.maps.yimg.com/png?v=1.7&t=a&s=256&x=%2&y=%3&z=%1");
-		l->setMapAdapter(mapadapter);
-		sights->setMapAdapter(mapadapter);
-		museum->setMapAdapter(mapadapter);
-		pubs->setMapAdapter(mapadapter);
-		notes->setMapAdapter(mapadapter);
-		
-		mc->updateRequestNew();
-		mc->setZoom(zoom);
-		yahooActionOverlay->setEnabled(true);
-	} else if (action == googleActionMap)
+    }
+    else if (action == googleActionMap)
 	{
         int zoom = mapadapter->adaptedZoom();
         mc->setZoom(0);
@@ -573,10 +528,20 @@ void Citymap::mapproviderSelected(QAction* action)
 		notes->setMapAdapter(mapadapter);
 		mc->updateRequestNew();
 		mc->setZoom(zoom);
-		yahooActionOverlay->setEnabled(false);
-		overlay->setVisible(false);
-		yahooActionOverlay->setChecked(false);
 	}
+    else if (action == googleActionSatellite)
+    {
+        int zoom = mapadapter->adaptedZoom();
+        mc->setZoom(0);
+        mapadapter = new GoogleMapAdapter(GoogleMapAdapter::satellite);
+        l->setMapAdapter(mapadapter);
+        sights->setMapAdapter(mapadapter);
+        museum->setMapAdapter(mapadapter);
+        pubs->setMapAdapter(mapadapter);
+        notes->setMapAdapter(mapadapter);
+        mc->updateRequestNew();
+        mc->setZoom(zoom);
+    }
 }
 
 Citymap::~Citymap()
