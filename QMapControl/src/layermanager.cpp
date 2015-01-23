@@ -300,15 +300,11 @@ namespace qmapcontrol
         }
 
         //only draw basemaps
-        for (int i=0; i<mylayers.count(); i++)
+        foreach(const Layer* l, mylayers)
         {
-            Layer* l = mylayers.at(i);
-            if (l->isVisible())
+            if (l->isVisible() && l->layertype() == Layer::MapLayer)
             {
-                if (l->layertype() == Layer::MapLayer)
-                {
-                    l->drawYourImage(&painter, whilenewscroll);
-                }
+                l->drawYourImage(&painter, whilenewscroll);
             }
         }
 

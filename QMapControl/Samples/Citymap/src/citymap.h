@@ -59,10 +59,8 @@ class Citymap: public QMainWindow
                 QAction* toolsLocalDiskCache;
 
                 QAction* osmAction;
-                QAction* yahooActionMap;
-                QAction* yahooActionSatellite;
-                QAction* yahooActionOverlay;
                 QAction* googleActionMap;
+                QAction* googleActionSatellite;
 
                 QList<QAction*> zoomActions;
 
@@ -79,7 +77,6 @@ class Citymap: public QMainWindow
                 QPointF coord2;
 
                 Layer* l;
-                Layer* overlay;
 
                 LineString* pub_tour;
                 LineString* museum_tour;

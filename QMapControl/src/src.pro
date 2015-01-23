@@ -5,7 +5,7 @@ QT += gui
 greaterThan(QT_MAJOR_VERSION, 4): QT += widgets
 greaterThan(QT_MAJOR_VERSION, 4): cache()
 
-VERSION = 0.9.7.7
+VERSION = 0.9.7.8
 
 DEFINES += QMAPCONTROL_LIBRARY
 
