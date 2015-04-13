@@ -1,3 +1,14 @@
+0.9.7.9 (2015-04-13)
+=====
+- FIXED (BUG #22): Memory leak in MapControl::paintEvent
+- FIXED (BUG #23): MapControl resize call
+- IMPROVED: QMapControl now inherits from QFrame
+- ADDED: preliminary support for Google Maps API
+- ADDED: preliminary support for Google Maps for Business API
+- ADDED: preliminary support for Microsoft Bing Maps
+- IMPROVED: CityMaps demo updated with additional google maps layer types
+- REMOVED: yahoomaps; public api removed, no longer available
+
 0.9.7.8 (2015-01-23)
 =====
 - FIXED (BUG #22): Memory leak in MapControl::paintEvent

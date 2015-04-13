@@ -34,6 +34,7 @@
 #include "imagemanager.h"
 
 #include <QWidget>
+#include <QFrame>
 #include <QDir>
 
 //! QMapControl namespace
@@ -52,7 +53,7 @@ namespace qmapcontrol
      *
      * @author Kai Winter <kaiwinter@gmx.de>
      */
-    class QMAPCONTROL_EXPORT MapControl : public QWidget
+    class QMAPCONTROL_EXPORT MapControl : public QFrame
     {
         Q_OBJECT
 
@@ -301,9 +302,18 @@ namespace qmapcontrol
          */
         int loadingQueueSize();
 
+        //! returns the imagemanager pointer
+        /*!
+         *
+         * @return imagemanager pointer
+         */
+        ImageManager* getImageManager();
+
     private:
         void __init();
-        LayerManager* layermanager;
+        LayerManager* m_layermanager;
+        ImageManager* m_imagemanager;
+
         QPoint screen_middle; // middle of the widget (half size)
 
         QPoint pre_click_px; // used for scrolling (MouseMode Panning)
@@ -322,6 +332,8 @@ namespace qmapcontrol
         QMutex moveMutex; // used for method moveTo()
         QPointF target; // used for method moveTo()
         int steps; // used for method moveTo()
+
+        QPixmap *m_doubleBuffer;
 
         QPointF clickToWorldCoordinate ( QPoint click );
 

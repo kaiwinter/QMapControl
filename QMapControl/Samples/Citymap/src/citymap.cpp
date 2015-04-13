@@ -319,12 +319,19 @@ void Citymap::createActions()
 	
 	QActionGroup* mapproviderGroup = new QActionGroup(this);
     osmAction = new QAction(tr("OpenStreetMap"), mapproviderGroup);
-    googleActionMap = new QAction(tr("Google: Map"), mapproviderGroup);
+    googleActionMap = new QAction(tr("Google: Roadmap (default)"), mapproviderGroup);
     googleActionSatellite = new QAction(tr("Google: Satellite"), mapproviderGroup);
-	osmAction->setCheckable(true);
+
+    googleActionSatellite = new QAction(tr("Google: Satellite"), mapproviderGroup);
+    googleActionTerrain = new QAction(tr("Google: Terrain"), mapproviderGroup);
+    googleActionHybrid = new QAction(tr("Google: Hybrid"), mapproviderGroup);
+
+    osmAction->setCheckable(true);
 	googleActionMap->setCheckable(true);
     googleActionSatellite->setCheckable(true);
-	osmAction->setChecked(true);
+    googleActionTerrain->setCheckable(true);
+    googleActionHybrid->setCheckable(true);
+    osmAction->setChecked(true);
 	connect(mapproviderGroup, SIGNAL(triggered(QAction*)),
 			  this, SLOT(mapproviderSelected(QAction*)));
 		
@@ -362,6 +369,8 @@ void Citymap::createMenus()
 	mapMenu->addAction(osmAction);
 	mapMenu->addAction(googleActionMap);
     mapMenu->addAction(googleActionSatellite);
+    mapMenu->addAction(googleActionTerrain);
+    mapMenu->addAction(googleActionHybrid);
 	
     zoomMenu = menuBar()->addMenu(tr("&Zoom Level"));
     foreach( QAction* action, zoomActions )
@@ -534,6 +543,32 @@ void Citymap::mapproviderSelected(QAction* action)
         int zoom = mapadapter->adaptedZoom();
         mc->setZoom(0);
         mapadapter = new GoogleMapAdapter(GoogleMapAdapter::satellite);
+        l->setMapAdapter(mapadapter);
+        sights->setMapAdapter(mapadapter);
+        museum->setMapAdapter(mapadapter);
+        pubs->setMapAdapter(mapadapter);
+        notes->setMapAdapter(mapadapter);
+        mc->updateRequestNew();
+        mc->setZoom(zoom);
+    }
+    else if (action == googleActionTerrain)
+    {
+        int zoom = mapadapter->adaptedZoom();
+        mc->setZoom(0);
+        mapadapter = new GoogleMapAdapter(GoogleMapAdapter::terrain);
+        l->setMapAdapter(mapadapter);
+        sights->setMapAdapter(mapadapter);
+        museum->setMapAdapter(mapadapter);
+        pubs->setMapAdapter(mapadapter);
+        notes->setMapAdapter(mapadapter);
+        mc->updateRequestNew();
+        mc->setZoom(zoom);
+    }
+    else if (action == googleActionHybrid)
+    {
+        int zoom = mapadapter->adaptedZoom();
+        mc->setZoom(0);
+        mapadapter = new GoogleMapAdapter(GoogleMapAdapter::hybrid);
         l->setMapAdapter(mapadapter);
         sights->setMapAdapter(mapadapter);
         museum->setMapAdapter(mapadapter);

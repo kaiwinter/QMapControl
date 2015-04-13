@@ -3,7 +3,6 @@
 
 #include <mapcontrol.h>
 #include <osmmapadapter.h>
-#include <yahoomapadapter.h>
 #include <googlemapadapter.h>
 #include <maplayer.h>
 #include <geometrylayer.h>
@@ -61,6 +60,8 @@ class Citymap: public QMainWindow
                 QAction* osmAction;
                 QAction* googleActionMap;
                 QAction* googleActionSatellite;
+                QAction* googleActionTerrain;
+                QAction* googleActionHybrid;
 
                 QList<QAction*> zoomActions;
 
